@@ -79,6 +79,9 @@ function renderContextCard(data) {
           <div class="thread-line"></div>
           ${nodesHtml}
         </div>
+        <div class="context-card-footer">
+          <button class="q4-link-btn" id="q4LinkFromContext">이 맥락으로 질문하기 →</button>
+        </div>
       </div>
       <div class="context-side">
         <div class="side-mini">
@@ -92,6 +95,12 @@ function renderContextCard(data) {
   // 노드 순차 페이드인 (검색 중처럼 보이지 않게 빠르게, 0.25초 간격)
   document.querySelectorAll('#context-root .node').forEach((el, i) => {
     el.style.animationDelay = `${i * 0.25}s`;
+  });
+
+  document.getElementById('q4LinkFromContext')?.addEventListener('click', () => {
+    if (typeof goToQuestionWithContext === 'function') {
+      goToQuestionWithContext(data.aiCategory, data.entity.name);
+    }
   });
 }
 
