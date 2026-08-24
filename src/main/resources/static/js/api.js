@@ -81,5 +81,26 @@ const API = (() => {
     }
   }
 
-  return { getContext, postHandoff, postQuestion };
+  /**
+   * F1: 비구조화 텍스트 자동 분류 (결정/이유/근거/잡담)
+   * 실제 API: POST /api/classify  body: { text, source }
+   * 로컬 환경엔 LLM 키가 없으므로, 백엔드/LLM 완성 전까지는
+   * classifier.js의 규칙 기반 분류기로 폴백한다.
+   */
+  async function classifyText(text, source) {
+    try {
+      const res = await fetch('/api/classify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, source }),
+      });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      return res.json(); // { type, confidence }
+    } catch (e) {
+      console.warn('[API] classify 실제 API 미응답, 규칙기반 폴백 사용:', e.message);
+      return Classifier.classify(text); // classifier.js 제공
+    }
+  }
+
+  return { getContext, postHandoff, postQuestion, classifyText };
 })();
