@@ -60,11 +60,41 @@ async function loadContextCard(projectCode) {
   root.innerHTML = `<div class="loading-state">맥락을 불러오는 중…</div>`;
 
   try {
-    const data = await API.getContext(projectCode);
+    let data = await API.getContext(projectCode);
+    data = await tryBuildFromPRs(projectCode, data);
     await renderContextCard(data);
   } catch (e) {
     console.error('컨텍스트 로드 실패:', e);
     root.innerHTML = `<div class="error-state">맥락을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</div>`;
+  }
+}
+
+/**
+ * 해당 프로젝트에 PR 템플릿 기반 기록(mock/pr_events.json)이 있으면
+ * prParser.js로 체인을 조립해 정적 mock의 chain을 대체한다.
+ * 없으면 정적 mock 그대로 사용 — PR이 아직 안 쌓인 프로젝트는 기존 방식 유지.
+ */
+async function tryBuildFromPRs(projectCode, baseData) {
+  if (typeof PRParser === 'undefined') return baseData;
+  try {
+    const [prRes, rawRes] = await Promise.all([
+      fetch('/mock/pr_events.json'),
+      fetch('/mock/raw_events.json'),
+    ]);
+    const prMap = await prRes.json();
+    const rawEvents = await rawRes.json();
+    const prs = prMap[projectCode];
+    if (!prs || !prs.length) return baseData; // 이 프로젝트엔 PR 기록 없음 → 정적 mock 유지
+
+    // 여러 PR이 있으면 병합 (최신 것부터), 지금은 프로젝트당 1건 예시
+    const merged = prs.flatMap(pr => PRParser.parsePR(pr, rawEvents).chain);
+    if (!merged.length) return baseData;
+
+    const hopDepth = Math.max(...merged.map(n => n.depth));
+    return { ...baseData, chain: merged, hopDepth };
+  } catch (e) {
+    console.warn('[PRParser] PR 기반 조립 실패, 정적 mock 유지:', e.message);
+    return baseData;
   }
 }
 
