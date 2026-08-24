@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>떠난 사람은 없다</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">떠난 사람은 없다</div>
+  <div class="tabs">
+    <div class="tab active" data-s="2">이관</div>
+    <div class="tab" data-s="3">맥락카드</div>
+  </div>
+</div>
+
+<!-- F2: 이관 -->
+<section class="screen active" id="s2">
+  <div class="kicker">F2 · 이관 트리거 · 필수</div>
+  <div class="hero-title">퇴사 처리에는<br>작성할 문서가 없습니다</div>
+  <div class="hero-desc">담당자를 바꾸는 데 필요한 건 버튼 하나입니다.</div>
+  <div class="role-badge admin">● 관리자 권한으로 접속 중 · 이관 가능</div>
+
+  <div class="handoff-main" id="handoffMain">
+    <div class="check-icon">✓</div>
+    <div style="font-size:15px; font-weight:700; margin-bottom:6px;">김도현 개발자 → 정하은 개발자</div>
+    <div style="font-size:12px; color:var(--text-dim); margin-bottom:22px;">담당 프로젝트 3건이 이관됩니다. 축적된 결정·근거 그래프는 그대로 유지됩니다.</div>
+    <button class="handoff-btn" id="handoffBtn">담당자 이관하기</button>
+    <div id="handoffStatus" style="font-size:12px; color:var(--thread); margin-top:10px;"></div>
+    <div class="handoff-empty-note">입력 항목 없음 · 첨부파일 없음 · 사유 작성 불필요 · role: admin required</div>
+  </div>
+</section>
+
+<!-- F3: 맥락카드 -->
+<section class="screen" id="s3">
+  <div class="kicker">F3 · 컨텍스트 카드 · 필수</div>
+  <div class="hero-title">질문하기 전에,<br>답이 먼저 도착합니다</div>
+  <div class="hero-desc">프로젝트 화면에 들어오는 순간, 담당·결정·이유·근거가 순서대로 이어집니다.</div>
+
+  <div id="context-root">
+    <div class="loading-state">맥락을 불러오는 중…</div>
+  </div>
+</section>
+
+<script src="/js/api.js"></script>
+<script src="/js/handoff.js"></script>
+<script src="/js/context.js"></script>
+<script>
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('s' + t.dataset.s).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
