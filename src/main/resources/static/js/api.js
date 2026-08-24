@@ -102,5 +102,26 @@ const API = (() => {
     }
   }
 
-  return { getContext, postHandoff, postQuestion, classifyText };
+  /**
+   * F6: 텍스트 요약 (원문이 길 때만 조건부 개입)
+   * 실제 API: POST /api/summarize  body: { text }
+   * 로컬 환경엔 LLM 키가 없으므로, 백엔드/LLM 완성 전까지는
+   * summarizer.js의 규칙 기반 요약기로 폴백한다.
+   */
+  async function summarizeText(text) {
+    try {
+      const res = await fetch('/api/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      return res.json(); // { summary, wasSummarized, originalLength }
+    } catch (e) {
+      console.warn('[API] summarize 실제 API 미응답, 규칙기반 폴백 사용:', e.message);
+      return Summarizer.summarize(text); // summarizer.js 제공
+    }
+  }
+
+  return { getContext, postHandoff, postQuestion, classifyText, summarizeText };
 })();

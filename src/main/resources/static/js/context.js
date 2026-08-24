@@ -7,12 +7,31 @@ function nodeTypeLabel(type) {
   return { decision: '결정', reason: '왜냐하면', evidence: '근거' }[type] || type;
 }
 
-function renderNode(node) {
+/**
+ * 근거(evidence) 노드는 원문(node.originalText)이 있으면 Summarizer로
+ * 동적으로 요약 여부를 판단한다 — mock의 aiSummarized 플래그에 의존하지 않고
+ * 실제 길이 기준으로 매번 계산한다 (임계값 80자, summarizer.js 참고).
+ */
+async function resolveEvidenceDisplay(node) {
+  if (node.type !== 'evidence' || !node.originalText) {
+    return { text: node.text, aiSummarized: false };
+  }
+  const result = await API.summarizeText(node.originalText);
+  return {
+    text: result.wasSummarized ? result.summary : node.originalText,
+    aiSummarized: result.wasSummarized,
+  };
+}
+
+function renderNode(node, evidenceDisplay) {
   const supersededClass = node.superseded ? ' superseded' : '';
   const tagClass = node.type === 'evidence' ? 'node-tag evidence-tag' : 'node-tag';
   const dotClass = node.type === 'evidence' ? 'node-dot evidence-dot' : 'node-dot';
 
-  const aiBadge = node.aiSummarized
+  const displayText = evidenceDisplay ? evidenceDisplay.text : node.text;
+  const aiSummarized = evidenceDisplay ? evidenceDisplay.aiSummarized : false;
+
+  const aiBadge = aiSummarized
     ? `<span class="ai-badge">AI 요약</span>`
     : '';
 
@@ -29,7 +48,7 @@ function renderNode(node) {
       <div class="${dotClass}"></div>
       <div class="${tagClass}">${nodeTypeLabel(node.type)}</div>
       ${aiBadge}
-      <div class="node-text">${node.text}</div>
+      <div class="node-text">${displayText}</div>
       ${dateHtml}
       ${evidenceHtml}
     </div>
@@ -42,21 +61,26 @@ async function loadContextCard(projectCode) {
 
   try {
     const data = await API.getContext(projectCode);
-    renderContextCard(data);
+    await renderContextCard(data);
   } catch (e) {
     console.error('컨텍스트 로드 실패:', e);
     root.innerHTML = `<div class="error-state">맥락을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</div>`;
   }
 }
 
-function renderContextCard(data) {
+async function renderContextCard(data) {
   const root = document.getElementById('context-root');
 
   const relatedHtml = (data.related || [])
     .map(r => `<div class="related-item">${r.name}<div class="rdate">${r.date} · ${r.note}</div></div>`)
     .join('');
 
-  const nodesHtml = data.chain.map(renderNode).join('');
+  // 근거 노드는 요약 여부를 먼저 계산한 뒤 렌더링 (필요한 곳에만 AI 개입)
+  const nodesHtml = (
+    await Promise.all(
+      data.chain.map(async (node) => renderNode(node, await resolveEvidenceDisplay(node)))
+    )
+  ).join('');
 
   root.innerHTML = `
     <div class="case-strip">
