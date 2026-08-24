@@ -7,7 +7,14 @@ const Q4_BASE_CATEGORIES = ['인증/로그인', '결제/정산', '데이터 파�
 const Q4_ADD_NEW = '__add_new__';
 
 let q4Categories = [...Q4_BASE_CATEGORIES];
-let q4Questions = [];
+let q4Questions = [
+  { id: 'q1', category: '인증/로그인', nodeType: 'reason', text: 'OAuth2 전환이 세션 취약점 때문인가요, 아니면 정책상 결정인가요?', projectName: '인증 시스템', createdAt: '2026-08-25T09:31:00' },
+  { id: 'q2', category: '인증/로그인', nodeType: 'decision', text: '콜백 URL을 화이트리스트 방식으로 바꾼 이유가 뭔가요?', projectName: '인증 시스템', createdAt: '2026-08-25T10:02:00' },
+  { id: 'q3', category: '결제/정산', nodeType: 'evidence', text: '재시도 정책이 3회로 정해진 근거가 있나요?', projectName: '결제 모듈', createdAt: '2026-08-25T11:14:00' },
+  { id: 'q4', category: '결제/정산', nodeType: 'reason', text: '환불 승인 단계를 없앤 이유가 뭔가요?', projectName: '결제 모듈', createdAt: '2026-08-26T09:02:00' },
+  { id: 'q5', category: '인프라/배포', nodeType: 'reason', text: 'CI 단계를 줄인 게 속도 때문인가요, 비용 때문인가요?', projectName: '배포 파이프라인', createdAt: '2026-08-26T14:20:00' },
+  { id: 'q6', category: '데이터 파이프라인', nodeType: 'evidence', text: '정산 오류 발견까지 19시간 걸렸다는 수치는 어디서 나온 건가요?', projectName: '정산 배치 파이프라인', createdAt: '2026-08-27T09:10:00' },
+];
 let q4ActiveFilter = '전체';
 
 function q4NodeTypeLabel(type) {
