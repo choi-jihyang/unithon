@@ -730,6 +730,33 @@
     <div class="section">
         <div class="section-head">
             <div class="section-title">
+                유사 질문 검색
+                <span class="section-badge opt">(임베딩 데모)</span>
+            </div>
+        </div>
+        <div class="card">
+            <div class="section-note" style="margin-bottom: 14px">
+                과거 질문 중 의미가 비슷한 것을 임베딩 유사도로 찾아 보여줍니다.
+                아래 버튼은 시연용 예시 질문입니다.
+            </div>
+            <div class="sim-demo-row">
+                <button class="btn ghost sm sim-demo-btn" id="simDemoBtn0">
+                    예시 1 · "인증 토큰 관련해서 궁금한 게 있어요"
+                </button>
+                <button class="btn ghost sm sim-demo-btn" id="simDemoBtn1">
+                    예시 2 · "로그인 처리 어떻게 되어 있나요"
+                </button>
+                <button class="btn ghost sm sim-demo-btn" id="simDemoBtn2">
+                    예시 3 · "이 부분 예전에 누가 담당했는지 알 수 있나요"
+                </button>
+            </div>
+            <div id="simSearchResult"></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-head">
+            <div class="section-title">
                 질문 이력
             </div>
         </div>
