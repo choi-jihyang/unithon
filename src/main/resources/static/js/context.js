@@ -6,12 +6,14 @@
     const caseData = {
         "PJ-014": {
             title: "인증 시스템",
+            originalText:
+                "OAuth2 기반 로그인 플로우를 리팩터링하면서 세션 만료 처리를 토큰 갱신 방식으로 변경했다. 기존에는 만료 시 강제 로그아웃이었는데, 리프레시 토큰을 도입해 사용자 경험을 개선했다. 관련 보안 검토에서 리프레시 토큰 저장 위치(localStorage vs httpOnly 쿠키) 논의가 있었고, httpOnly 쿠키로 최종 결정했다.",
             project: "그룹웨어",
             app: "GitHub",
             tags: ["백엔드", "착수 2025.03.05"],
             category: "인증/로그인",
             hop: "3-HOP TRACED",
-            afterView: "후속 문의 1건",
+            afterView: "관련 질문 1건",
             related: [
                 { name: "결제 모듈", date: "2025.06.14 · 정기결제 로직 변경" },
                 { name: "배포 파이프라인", date: "2025.07.04 · CI 단계 축소" },
@@ -39,12 +41,14 @@
         },
         "PJ-021": {
             title: "결제 모듈",
+            originalText:
+                "PG사 연동 방식을 변경하면서 결제 실패 시 재시도 로직을 추가했다. 멱등성 키(idempotency key)를 도입해 중복 결제를 방지했고, 웹훅 처리 순서가 보장되지 않는 문제 때문에 별도 큐를 붙였다. 정산 배치와의 타이밍 이슈로 하루 지연 처리로 임시 조정한 이력이 있다.",
             project: "ERP",
             app: "Jira",
             tags: ["백엔드", "착수 2025.04.10"],
             category: "결제/정산",
             hop: "2-HOP TRACED",
-            afterView: "후속 문의 2건",
+            afterView: "관련 질문 2건",
             related: [
                 { name: "인증 시스템", date: "2025.05.07 · OAuth2 기반 인증 전환" },
             ],
@@ -71,12 +75,14 @@
         },
         "PJ-033": {
             title: "배포 파이프라인",
+            originalText:
+                "블루/그린 배포로 전환하면서 헬스체크 기준을 재정의했다. 기존엔 단순 200 응답만 봤는데, 의존 서비스(DB, 캐시) 연결 상태까지 포함하도록 바꿨다. 롤백 자동화를 넣으면서 배포 실패 시 평균 복구 시간이 크게 줄었다.",
             project: "MES",
             app: "GitHub",
             tags: ["인프라", "착수 2025.02.20"],
             category: "인프라/배포",
             hop: "2-HOP TRACED",
-            afterView: "후속 문의 1건",
+            afterView: "관련 질문 1건",
             related: [
                 { name: "CI 캐시 최적화", date: "2025.08.24 · 캐시 계층 추가" },
             ],
@@ -103,12 +109,14 @@
         },
         "PJ-040": {
             title: "CI 캐시 최적화",
+            originalText:
+                "빌드 캐시 히트율이 낮아서 원인을 추적했더니, 의존성 락파일 해시 계산 방식이 매번 미세하게 달라지고 있었다. 락파일 정렬 순서를 고정하고 캐시 키 전략을 바꿔 히트율을 크게 올렸다. 빌드 시간이 절반 가까이 줄었다.",
             project: "MES",
             app: "GitHub",
             tags: ["인프라", "착수 2025.08.01"],
             category: "인프라/배포",
             hop: "1-HOP TRACED",
-            afterView: "후속 문의 없음",
+            afterView: "관련 질문 없음",
             related: [
                 { name: "배포 파이프라인", date: "2025.07.04 · CI 단계 축소" },
             ],
@@ -157,6 +165,52 @@
                 </div>`;
     }
 
+    function ensureSummaryBox() {
+        let box = document.getElementById("caseSummaryBox");
+        if (!box) {
+            box = document.createElement("div");
+            box.id = "caseSummaryBox";
+            box.className = "case-summary-box";
+            document.querySelector(".context-card-head").appendChild(box);
+        }
+        return box;
+    }
+
+    function renderSummary(text, isLoading) {
+        const box = ensureSummaryBox();
+        box.innerHTML = isLoading
+            ? '<span class="case-summary-loading">요약 불러오는 중…</span>'
+            : `<span class="case-summary-text">${text}</span>`;
+    }
+
+    async function loadSummary(key, data) {
+        if (data.summary) {
+            renderSummary(data.summary, false);
+            return;
+        }
+        renderSummary(null, true);
+        try {
+            const res = await fetch("/api/summarize", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: data.originalText }),
+            });
+            if (!res.ok) throw new Error(`status ${res.status}`);
+            const json = await res.json();
+            data.summary = json.summary;
+        } catch (e) {
+            console.warn(
+                "[F3] /api/summarize 실패, 원문 앞부분으로 폴백:",
+                e.message,
+            );
+            data.summary = data.originalText.slice(0, 80).trim() + "…";
+        }
+        // 응답 도착 시점에 다른 카드로 이미 넘어갔다면 반영하지 않음
+        if (document.getElementById("caseCode").textContent === key) {
+            renderSummary(data.summary, false);
+        }
+    }
+
     function openCaseModal(key) {
         const data = caseData[key];
         if (!data) return;
@@ -175,6 +229,7 @@
             '<div class="thread-line"></div>' +
             data.chain.map(renderChainNode).join("");
         document.getElementById("caseAfterView").textContent = data.afterView;
+        loadSummary(key, data);
         document.getElementById("caseLinkBtn").onclick = () => {
             closeCaseModal();
             linkToQuestion(data.title, data.category);
