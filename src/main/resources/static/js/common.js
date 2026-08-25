@@ -29,6 +29,20 @@
 
     const todayLabel = "2026.08.25";
 
+    // 로그인 대체 — 선택된 userSeq를 localStorage에 저장해둔다. 실제 로그인이
+    // 붙기 전까지 "유저 목록 중 한 명을 로그인한 것으로 가정"하는 용도.
+    // 콘솔에서 setCurrentUserSeq(3) 하면 코드 수정 없이 다른 계정으로 테스트 가능.
+    const DEFAULT_USER_SEQ = 1; // 김도현
+
+    function getCurrentUserSeq() {
+        const stored = Number(localStorage.getItem("userSeq"));
+        return stored || DEFAULT_USER_SEQ;
+    }
+
+    function setCurrentUserSeq(userSeq) {
+        localStorage.setItem("userSeq", userSeq);
+    }
+
     function linkToQuestion(title, category) {
         document
             .querySelectorAll(".tab")
