@@ -1,31 +1,97 @@
 /**
  * questions.js — F4 질문 (질문 이력 → 답변 코멘트 팝업)
+ *
+ * 질문 목록/답변 스레드는 더 이상 로컬 qaThreads mock이 아니라 QuestionController API에서
+ * 가져온다: GET /api/questions(목록), GET /api/questions/{questionSeq}/answers(답변 스레드),
+ * POST /api/questions/{questionSeq}/answers(답변 등록).
  */
-    // ===== 질문 이력 → 답변 코멘트 팝업 =====
-    const qaThreads = {};
-    let currentQaKey = null;
+    // questionSeq -> QuestionListItem. 목록 응답을 캐시해 모달을 열 때 재사용한다.
+    let questionsBySeq = {};
+    let currentQuestionSeq = null;
 
-    function extractQuestionInfo(item) {
-        const clone = item.cloneNode(true);
-        const tagEl = clone.querySelector(".node-type-tag");
-        const tagText = tagEl ? tagEl.textContent.trim() : "";
-        const tagClass = tagEl
-            ? tagEl.className.replace("node-type-tag", "").trim()
-            : "";
-        if (tagEl) tagEl.remove();
-        const metaEl = clone.querySelector(".q-meta");
-        const metaText = metaEl ? metaEl.textContent.trim() : "";
-        if (metaEl) metaEl.remove();
-        const mainText = clone.textContent.replace(/\s+/g, " ").trim();
-        const dashIdx = mainText.indexOf("—");
-        const title = dashIdx >= 0 ? mainText.slice(0, dashIdx).trim() : mainText;
-        const question =
-            dashIdx >= 0 ? mainText.slice(dashIdx + 1).trim() : "";
-        return { title, question, tagText, tagClass, metaText };
+    const targetPartTagMap = {
+        DECISION: { text: "결정", cls: "decision" },
+        REASON: { text: "이유", cls: "reason" },
+        EVIDENCE: { text: "근거", cls: "evidence" },
+    };
+
+    function targetPartTag(targetPart) {
+        return targetPartTagMap[targetPart] || { text: targetPart || "", cls: "" };
     }
 
-    function renderQaThread() {
-        const answers = qaThreads[currentQaKey] || [];
+    function formatDateTimeDot(value) {
+        if (!value) return "";
+        const [datePart, timePart] = String(value).split("T");
+        const dateDot = datePart.replace(/-/g, ".");
+        const hm = timePart ? timePart.slice(0, 5) : "";
+        return hm ? `${dateDot} ${hm}` : dateDot;
+    }
+
+    function renderQuestionItem(q) {
+        const tag = targetPartTag(q.targetPart);
+        const titlePrefix = q.cardTitle ? `${q.cardTitle} — ` : "";
+        return `<div class="q-list-item" data-question-seq="${q.questionSeq}">
+                    ${titlePrefix}"${q.content}"<span class="node-type-tag ${tag.cls}">${tag.text}</span>
+                    <div class="q-meta">${q.userName} · ${formatDateTimeDot(q.createdAt)}</div>
+                </div>`;
+    }
+
+    function renderQuestionHistory(questions) {
+        const listEl = document.getElementById("questionHistoryList");
+        if (questions.length === 0) {
+            listEl.innerHTML =
+                '<div class="api-error-note">아직 등록된 질문이 없습니다.</div>';
+            return;
+        }
+
+        const groups = new Map();
+        questions.forEach((q) => {
+            const cat = q.category || "미분류";
+            if (!groups.has(cat)) groups.set(cat, []);
+            groups.get(cat).push(q);
+        });
+
+        listEl.innerHTML = Array.from(groups.entries())
+            .map(
+                ([cat, items]) => `
+            <div class="cat-group">
+                <div class="cat-group-head">
+                    <div class="cat-group-title">${cat}</div>
+                    <div class="cat-group-count">${items.length}건</div>
+                </div>
+                <div class="cat-group-items">
+                    ${items.map(renderQuestionItem).join("")}
+                </div>
+            </div>`,
+            )
+            .join("");
+
+        listEl.querySelectorAll(".q-list-item").forEach((item) => {
+            item.addEventListener("click", () =>
+                openQaModal(Number(item.dataset.questionSeq)),
+            );
+        });
+    }
+
+    async function loadQuestions() {
+        const listEl = document.getElementById("questionHistoryList");
+        try {
+            const res = await fetch("/api/questions");
+            if (!res.ok) throw new Error(`status ${res.status}`);
+            const questions = await res.json();
+            questionsBySeq = {};
+            questions.forEach((q) => {
+                questionsBySeq[q.questionSeq] = q;
+            });
+            renderQuestionHistory(questions);
+        } catch (e) {
+            console.warn("[F4] /api/questions 조회 실패:", e.message);
+            listEl.innerHTML =
+                '<div class="api-error-note">질문 목록을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</div>';
+        }
+    }
+
+    function renderAnswerThread(answers) {
         const thread = document.getElementById("qaThread");
         if (answers.length === 0) {
             thread.innerHTML =
@@ -35,49 +101,95 @@
         thread.innerHTML = answers
             .map(
                 (a) => `<div class="qa-item">
-                    <div class="qa-item-text">${a.text}</div>
-                    <div class="qa-item-meta">${a.author} · ${a.time}</div>
+                    <div class="qa-item-text">${a.content}</div>
+                    <div class="qa-item-meta">${a.userName} · ${formatDateTimeDot(a.createdAt)}</div>
                 </div>`,
             )
             .join("");
         thread.scrollTop = thread.scrollHeight;
     }
 
-    function openQaModal(item) {
-        const info = extractQuestionInfo(item);
-        currentQaKey = item.dataset.q;
-        document.getElementById("qaModalTitle").textContent = info.title;
-        document.getElementById("qaModalQuestion").textContent = info.question;
-        document.getElementById("qaModalMeta").textContent = info.metaText;
+    async function loadAnswerThread(questionSeq) {
+        const thread = document.getElementById("qaThread");
+        thread.innerHTML = '<div class="qa-empty">불러오는 중…</div>';
+        try {
+            const res = await fetch(`/api/questions/${questionSeq}/answers`);
+            if (!res.ok) throw new Error(`status ${res.status}`);
+            const answers = await res.json();
+            renderAnswerThread(answers);
+        } catch (e) {
+            console.warn("[F4] 답변 스레드 조회 실패:", e.message);
+            thread.innerHTML =
+                '<div class="api-error-note">답변을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</div>';
+        }
+    }
+
+    function renderQaFeedback(message) {
+        const el = document.getElementById("qaFeedback");
+        if (!el) return;
+        el.innerHTML = message ? `<div class="api-error-note">${message}</div>` : "";
+    }
+
+    function openQaModal(questionSeq) {
+        const q = questionsBySeq[questionSeq];
+        if (!q) return;
+        currentQuestionSeq = questionSeq;
+
+        const tag = targetPartTag(q.targetPart);
+        document.getElementById("qaModalTitle").textContent =
+            q.cardTitle || q.category || "질문";
+        document.getElementById("qaModalQuestion").textContent = q.content;
+        document.getElementById("qaModalMeta").textContent =
+            `${q.userName} · ${formatDateTimeDot(q.createdAt)}`;
         const tagEl = document.getElementById("qaModalTag");
-        tagEl.textContent = info.tagText;
-        tagEl.className = `node-type-tag ${info.tagClass}`;
-        renderQaThread();
+        tagEl.textContent = tag.text;
+        tagEl.className = `node-type-tag ${tag.cls}`;
+
+        renderQaFeedback("");
         document.getElementById("qaAnswerInput").value = "";
         document.getElementById("qaModalOverlay").classList.add("show");
+        loadAnswerThread(questionSeq);
     }
 
     function closeQaModal() {
         document.getElementById("qaModalOverlay").classList.remove("show");
     }
 
-    function submitQaAnswer() {
+    async function submitQaAnswer() {
         const input = document.getElementById("qaAnswerInput");
         const text = input.value.trim();
-        if (!text || !currentQaKey) return;
-        if (!qaThreads[currentQaKey]) qaThreads[currentQaKey] = [];
-        const now = new Date();
-        const pad = (n) => String(n).padStart(2, "0");
-        const time = `${todayLabel} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-        qaThreads[currentQaKey].push({ author: "나", time, text });
-        input.value = "";
-        renderQaThread();
+        if (!text || !currentQuestionSeq) return;
+
+        const btn = document.getElementById("qaAnswerBtn");
+        btn.disabled = true;
+        renderQaFeedback("");
+
+        try {
+            const res = await fetch(
+                `/api/questions/${currentQuestionSeq}/answers`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userSeq: getCurrentUserSeq(),
+                        content: text,
+                    }),
+                },
+            );
+            if (!res.ok) throw new Error(`status ${res.status}`);
+            await res.json();
+            input.value = "";
+            await loadAnswerThread(currentQuestionSeq);
+        } catch (e) {
+            console.warn("[F4] 답변 등록 실패:", e.message);
+            renderQaFeedback("답변 등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        } finally {
+            btn.disabled = false;
+        }
     }
 
-    document.querySelectorAll(".q-list-item").forEach((item, i) => {
-        item.dataset.q = `q${i}`;
-        item.addEventListener("click", () => openQaModal(item));
-    });
+    loadQuestions();
+
     document
         .getElementById("qaModalClose")
         .addEventListener("click", closeQaModal);
@@ -91,7 +203,7 @@
         if (e.key === "Enter") submitQaAnswer();
     });
 
-    // ===== 유사 질문 검색 (임베딩 기반, 데모) =====
+    // ===== 유사 질문 검색 (임베딩 기반, 데모) — 이번 작업 범위 아님, 그대로 둠 =====
     let embeddingsCache = null;
     let demoQueriesCache = null;
 
