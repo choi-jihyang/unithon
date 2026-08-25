@@ -1,0 +1,14 @@
+{
+  "id": "msg_01ABC123",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "OAuth2 리팩터링으로 세션 만료 시 강제 로그아웃 대신 리프레시 토큰 갱신 방식을 도입했다."
+    }
+  ],
+  "model": "claude-haiku-4-5-20251001",
+  "stop_reason": "end_turn",
+  "usage": { "input_tokens": 45, "output_tokens": 28 }
+}

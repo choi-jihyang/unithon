@@ -19,10 +19,11 @@ data class ClaudeResponse(val content: List<ClaudeContentBlock>)
 @Service
 class SummarizeService(
     webClientBuilder: WebClient.Builder,
-    @Value("\${anthropic.api-key}") private val apiKey: String
+    @Value("\${anthropic.api-key}") private val apiKey: String,
+    @Value("\${anthropic.base-url:https://api.anthropic.com/v1/messages}") private val baseUrl: String
 ) {
     private val client = webClientBuilder
-        .baseUrl("https://api.anthropic.com/v1/messages")
+        .baseUrl(baseUrl)
         .defaultHeader("x-api-key", apiKey)
         .defaultHeader("anthropic-version", "2023-06-01")
         .defaultHeader("content-type", "application/json")
