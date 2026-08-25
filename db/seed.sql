@@ -6,12 +6,11 @@
 -- TRUNCATE TABLE cards;
 -- TRUNCATE TABLE users;
 
-INSERT INTO users (user_id, name, position_seq, position_name, is_use, created_at) VALUES
-  ('kimdohyun', '김도현', 1, '사원', 1, NOW()),
-  ('junghaeun', '정하은', 1, '사원', 1, NOW()),
-  ('leeseojun', '이서준', 1, '사원', 1, NOW()),
-  ('parkjimin', '박지민', 1, '사원', 1, NOW()),
-  ('admin',     '관리자', 7, '이사', 1, NOW());
+INSERT INTO users (user_id, name, position_seq, position_name, department_seq, department_name, is_use, created_at) VALUES
+  ('kimdohyun', '김도현', 1, '사원', 1, '개발1팀', 1, NOW()),
+  ('junghaeun', '정하은', 1, '사원', 1, '개발1팀', 1, NOW()),
+  ('leeseojun', '이서준', 1, '사원', 1, '개발1팀', 1, NOW()),
+  ('parkjimin', '박지민', 5, '팀장', 1, '개발1팀', 1, NOW());
 
 INSERT INTO cards (
   user_seq, solution, category, title,
