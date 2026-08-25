@@ -67,6 +67,7 @@
     }
 
     async function loadSummary(key, data) {
+        console.log("[DEBUG] loadSummary called", key, data);
         if (data.summary) {
             renderSummary(data.summary, false);
             return;
