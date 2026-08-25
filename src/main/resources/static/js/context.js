@@ -49,7 +49,12 @@
             box = document.createElement("div");
             box.id = "caseSummaryBox";
             box.className = "case-summary-box";
-            document.querySelector(".context-card-head").appendChild(box);
+            // context-card-head 안에 넣으면 솔루션명 owner-line과 같은 flex row를
+            // 공유해서 공간을 다퉈 솔루션명이 밀려나 보이는 문제가 있었다. 헤더
+            // 바로 다음 줄(별도 row)로 배치한다.
+            document
+                .querySelector(".context-card-head")
+                .insertAdjacentElement("afterend", box);
         }
         return box;
     }
@@ -229,13 +234,17 @@
                     : "관련 질문 없음";
             document.getElementById("caseLinkBtn").onclick = () => {
                 closeCaseModal();
-                linkToQuestion(detail.title, detail.category);
+                linkToQuestion(detail.title, detail.category, cardSeq);
             };
 
-            const wrapper =
-                cardSummaryCache[cardSeq] || (cardSummaryCache[cardSeq] = {});
-            wrapper.originalText = buildOriginalText(detail.chain);
-            loadSummary(key, wrapper);
+            // F6 AI 요약: 지금 단계에서는 화면에 노출 안 하기로 결정 — 끔.
+            // 다시 켤 땐 아래 두 줄만 복원하면 됨 (loadSummary/ensureSummaryBox는 그대로 둠).
+            // const wrapper =
+            //     cardSummaryCache[cardSeq] || (cardSummaryCache[cardSeq] = {});
+            // wrapper.originalText = buildOriginalText(detail.chain);
+            // loadSummary(key, wrapper);
+            const existingSummaryBox = document.getElementById("caseSummaryBox");
+            if (existingSummaryBox) existingSummaryBox.remove();
         } catch (e) {
             console.warn("[F3] /api/cards/{cardSeq} 조회 실패:", e.message);
             document.getElementById("caseChain").innerHTML =

@@ -840,6 +840,25 @@
             color: var(--text);
             font-weight: 700;
         }
+        .case-summary-box {
+            padding: 10px 26px 14px 23px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .case-summary-loading {
+            font-size: 13px;
+            color: var(--text-faint);
+            font-style: italic;
+        }
+        .case-summary-text {
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+        .case-summary-text::before {
+            content: "AI 요약 · ";
+            color: var(--text-faint);
+            font-weight: 600;
+        }
         .hop-badge {
             font-size: 13px;
             color: var(--text-faint);
