@@ -4,21 +4,21 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 
-private const val MIN_POSITION_SEQ_FOR_TRANSFER = 5L // 팀장(5)/본부장(6)/이사(7)
-
 @Service
 class OwnershipTransitionService(
     private val ownershipTransitionRepository: OwnershipTransitionRepository,
     private val userRepository: UserRepository,
 ) {
 
-    /** F2 이관 실행. 카드는 건드리지 않고 인계 이벤트 1행만 남긴다. */
+    /**
+     * F2 이관 실행. 카드는 건드리지 않고 인계 이벤트 1행만 남긴다.
+     *
+     * 직급 기반 권한 분리(팀장급 이상만 실행 가능)는 하지 않는다 — 고도화 단계에서 다룰 예정.
+     * 지금은 실행자(transitionedByUserSeq)가 실제 존재하는 계정인지만 확인한다.
+     */
     fun transfer(oldUserSeq: Long, newUserSeq: Long, transitionedByUserSeq: Long): OwnershipTransition {
-        val executor = userRepository.findById(transitionedByUserSeq).orElseThrow {
+        userRepository.findById(transitionedByUserSeq).orElseThrow {
             ResponseStatusException(HttpStatus.NOT_FOUND, "실행자를 찾을 수 없습니다: $transitionedByUserSeq")
-        }
-        if (executor.positionSeq < MIN_POSITION_SEQ_FOR_TRANSFER) {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "팀장급 이상만 이관을 실행할 수 있습니다.")
         }
         return ownershipTransitionRepository.save(
             OwnershipTransition(
