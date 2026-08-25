@@ -8,9 +8,12 @@
     if (unclassifiedMoreBtn) {
         unclassifiedMoreBtn.addEventListener("click", () => {
             const expanding = unclassifiedMoreBtn.textContent.trim() === "더보기";
+            // .hidden 카드만 찾으면 접을 때(이미 .hidden이 없는 상태) 아무 것도
+            // 안 걸려서 접기가 동작하지 않는다 — 5번째 카드부터는 항상 대상으로 삼는다.
             document
-                .querySelectorAll("#unclassifiedGrid .unclassified-card.hidden")
-                .forEach((card) => {
+                .querySelectorAll("#unclassifiedGrid .unclassified-card")
+                .forEach((card, idx) => {
+                    if (idx < 4) return;
                     card.classList.toggle("hidden", !expanding);
                 });
             unclassifiedMoreBtn.textContent = expanding ? "접기" : "더보기";
