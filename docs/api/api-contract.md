@@ -1,0 +1,87 @@
+*github*
+
+{
+"sha": "6dcb09b5...",
+"commit": {
+"message": "feat: OAuth2 기반 인증으로 전환",
+"author": {
+"name": "Kim Dohyun",
+"date": "2025-05-07T09:14:23Z"
+}
+},
+"html_url": "https://github.com/team/unithon/commit/6dcb09b5..."
+}
+
+*Jira*
+
+{
+"key": "INFRA-241",
+"summary": "세션 하이재킹 취약점",
+"description_text": "외부 보안 감사 결과, 기존 세션 토큰이 만료 처리 없이 재사용 가능한 구조로 확인됨. 심각도 High로 분류되어 즉시 조치 필요.",
+"status": "Resolved",
+"priority": "High",
+"created": "2025-05-06T14:02:11.000+0900",
+"assignee_name": "김도현",
+"project_key": "PJ-014"
+}
+
+*Linear*
+
+{
+"identifier": "ENG-91",
+"title": "Refund flow: skip manual approval step",
+"description_text": "환불 승인 단계 계속 병목이라던데 그냥 없애는 방향으로 갑시다.\n\n관련 PR: #158",
+"created_at": "2025-07-02T09:14:00.000Z",
+"priority": "보통",
+"assignee_name": "김도현",
+"status": "Done"
+}
+
+*Sentry*
+
+{
+"short_id": "PJ014-3",
+"message": "동일 세션 토큰이 서로 다른 IP에서 반복 사용됨",
+"count": 34,
+"first_seen": "2025-04-29T02:10:00Z",
+"last_seen": "2025-05-06T08:44:00Z",
+"assignee_name": "김도현",
+"project_name": "인증 시스템"
+}
+
+*Figma*
+
+[
+{
+"author": "정하은",
+"message": "환불 완료 화면에 승인 단계 안내 문구 빼도 되나요? 백엔드 로직 확인 필요",
+"created_at": "2025-07-02T09:20:11.000Z",
+"resolved": false
+},
+{
+"author": "디자이너B",
+"message": "로그인 화면에서 OAuth 버튼 순서 이대로 괜찮을까요?",
+"created_at": "2025-05-03T11:02:00.000Z",
+"resolved": true
+}
+]
+
+
+
+*Slack*
+
+[
+{
+"user_id": "U0234ABCDE",
+"message": "그거 OAuth 쪽으로 바꾸는 게 나을 것 같은데요, 세션 취약점 건도 있고",
+"created_at": "2025-05-07T09:14:23"
+},
+{
+"user_id": "U0234FGHIJ",
+"message": "내일 3시에 배포 가능하신가요",
+"created_at": "2025-05-07T09:15:20"
+}
+]
+
+
+

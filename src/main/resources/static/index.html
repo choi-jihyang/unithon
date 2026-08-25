@@ -3,163 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unithon 테스트 페이지</title>
-<style>
-  :root {
-    --bg: #0f172a;
-    --card: #1e293b;
-    --accent: #38bdf8;
-    --accent-dark: #0284c7;
-    --text: #e2e8f0;
-    --muted: #94a3b8;
-    --ok: #4ade80;
-    --err: #f87171;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    color: var(--text);
-  }
-  .card {
-    width: 100%;
-    max-width: 480px;
-    background: var(--card);
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-  }
-  h1 {
-    margin: 0 0 4px;
-    font-size: 24px;
-  }
-  .subtitle {
-    color: var(--muted);
-    margin: 0 0 24px;
-    font-size: 14px;
-  }
-  .section {
-    margin-bottom: 20px;
-  }
-  label {
-    display: block;
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-  input {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid #334155;
-    background: #0f172a;
-    color: var(--text);
-    font-size: 14px;
-  }
-  input:focus {
-    outline: none;
-    border-color: var(--accent);
-  }
-  button {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    background: var(--accent-dark);
-    color: white;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  button:hover { background: var(--accent); }
-  button:active { transform: scale(0.99); }
-  .result {
-    margin-top: 16px;
-    padding: 14px;
-    border-radius: 8px;
-    background: #0f172a;
-    font-size: 13px;
-    white-space: pre-wrap;
-    word-break: break-all;
-    min-height: 20px;
-    border: 1px solid #334155;
-  }
-  .status-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 6px;
-    background: var(--muted);
-  }
-  .status-dot.ok { background: var(--ok); }
-  .status-dot.err { background: var(--err); }
-  .greet-output {
-    margin-top: 10px;
-    font-size: 15px;
-    color: var(--accent);
-    min-height: 22px;
-  }
-  footer {
-    margin-top: 24px;
-    text-align: center;
-    font-size: 12px;
-    color: var(--muted);
-  }
-</style>
+<title>떠난 사람은 없다</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
-  <div class="card">
-    <h1>🚀 Unithon 테스트 페이지</h1>
-    <p class="subtitle">프론트엔드 · 백엔드 연동 확인용 페이지입니다.</p>
 
-    <div class="section">
-      <label>이름을 입력해 보세요</label>
-      <input id="nameInput" type="text" placeholder="예: 지향">
-      <div class="greet-output" id="greetOutput"></div>
-    </div>
-
-    <div class="section">
-      <button id="pingBtn">
-        <span class="status-dot" id="statusDot"></span>백엔드 연결 테스트 (/api/test)
-      </button>
-      <div class="result" id="result">버튼을 눌러 API 응답을 확인하세요.</div>
-    </div>
-
-    <footer>Spring Boot + Kotlin · static/index.html</footer>
+<div class="topbar">
+  <div class="brand">떠난 사람은 없다</div>
+  <div class="tabs">
+    <div class="tab active" data-s="2">이관</div>
+    <div class="tab" data-s="3">맥락카드</div>
   </div>
+</div>
 
+<!-- F2: 이관 -->
+<section class="screen active" id="s2">
+  <div class="kicker">F2 · 이관 트리거 · 필수</div>
+  <div class="hero-title">퇴사 처리에는<br>작성할 문서가 없습니다</div>
+  <div class="hero-desc">담당자를 바꾸는 데 필요한 건 버튼 하나입니다.</div>
+  <div class="role-badge admin">● 관리자 권한으로 접속 중 · 이관 가능</div>
+
+  <div class="handoff-main" id="handoffMain">
+    <div class="check-icon">✓</div>
+    <div style="font-size:15px; font-weight:700; margin-bottom:6px;">김도현 개발자 → 정하은 개발자</div>
+    <div style="font-size:12px; color:var(--text-dim); margin-bottom:22px;">담당 프로젝트 3건이 이관됩니다. 축적된 결정·근거 그래프는 그대로 유지됩니다.</div>
+    <button class="handoff-btn" id="handoffBtn">담당자 이관하기</button>
+    <div id="handoffStatus" style="font-size:12px; color:var(--thread); margin-top:10px;"></div>
+    <div class="handoff-empty-note">입력 항목 없음 · 첨부파일 없음 · 사유 작성 불필요 · role: admin required</div>
+  </div>
+</section>
+
+<!-- F3: 맥락카드 -->
+<section class="screen" id="s3">
+  <div class="kicker">F3 · 컨텍스트 카드 · 필수</div>
+  <div class="hero-title">질문하기 전에,<br>답이 먼저 도착합니다</div>
+  <div class="hero-desc">프로젝트 화면에 들어오는 순간, 담당·결정·이유·근거가 순서대로 이어집니다.</div>
+
+  <div id="context-root">
+    <div class="loading-state">맥락을 불러오는 중…</div>
+  </div>
+</section>
+
+<script src="/js/api.js"></script>
+<script src="/js/handoff.js"></script>
+<script src="/js/context.js"></script>
 <script>
-  const nameInput = document.getElementById('nameInput');
-  const greetOutput = document.getElementById('greetOutput');
-  nameInput.addEventListener('input', () => {
-    const v = nameInput.value.trim();
-    greetOutput.textContent = v ? `안녕하세요, ${v}님! 👋` : '';
-  });
-
-  const pingBtn = document.getElementById('pingBtn');
-  const resultBox = document.getElementById('result');
-  const statusDot = document.getElementById('statusDot');
-
-  pingBtn.addEventListener('click', async () => {
-    statusDot.className = 'status-dot';
-    resultBox.textContent = '요청 중...';
-    try {
-      const res = await fetch('/api/test');
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      resultBox.textContent = JSON.stringify(data, null, 2);
-      statusDot.className = 'status-dot ok';
-    } catch (err) {
-      resultBox.textContent = '요청 실패: ' + err.message + '\n(서버가 실행 중인지 확인하세요: ./gradlew bootRun)';
-      statusDot.className = 'status-dot err';
-    }
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('s' + t.dataset.s).classList.add('active');
+    });
   });
 </script>
 </body>
