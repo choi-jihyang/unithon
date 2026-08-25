@@ -30,7 +30,15 @@
 - [x] `QuestionController.kt` — `POST /api/questions`, `POST /api/questions/{questionSeq}/answers`
 - [x] `CardService` 상세 조회에 `afterViewCount`(=`questions.card_seq` count) 실제 연결, curl로 질문→답변→카운트 반영까지 확인
 
-> 테스트 중 발견: `application.properties`의 `anthropic.api-key=${ANTHROPIC_API_KEY}`에 기본값이 없어서, 이 env var가 없으면 **F6과 무관하게 앱 전체가 부팅 실패**한다. 검증은 로컬 전용 더미 값으로 우회했음 — 실제 해결은 별도 논의 필요(사용자가 "아직"이라고 보류함).
+> 테스트 중 발견: `application.properties`의 `anthropic.api-key=${ANTHROPIC_API_KEY}`에 기본값이 없어서, 이 env var가 없으면 **F6과 무관하게 앱 전체가 부팅 실패**한다. → PR #9에서 빈 값으로 고정해서 해결.
+
+## Task 4-1. 이관 권한 분리 제거 — ✅ 완료 (PR #10)
+- [x] `OwnershipTransitionService.transfer()`의 `position_seq>=5` 체크 제거 — 고도화 단계로 미룸
+
+## Task 4-2. `POST /api/cards` — ✅ 완료
+- [x] F1 "카드로 등록"의 유일한 저장 경로. `userSeq`만 필수, 나머지 nullable
+- [x] curl로 생성→목록 반영 확인 완료
+- [ ] 로그인/세션 없음 — `userSeq`는 "유저 목록 중 한 명을 로그인한 것으로 가정"하고 프론트가 고정값/선택 UI로 처리하기로 함 (백엔드 작업 아님)
 
 ## Task 5. 프론트 fetch 연결 — 프론트 담당자에게 전달 (내 작업 범위 아님)
 - [ ] `js/context.js` — `caseData` 인라인 상수 대신 `GET /api/cards?userSeq=`/`GET /api/cards/{id}?userSeq=` fetch로 채움 (렌더 함수 재사용)

@@ -15,10 +15,14 @@
 5. F1(연동수집)은 이번 범위에서 실제 백엔드 연동 없이 프론트 mock 유지 — `screen-features.md`도
    "GitHub/Jira/Figma는 구조화, Slack/Sentry/Linear는 자유서술이라 미분류 큐가 늘어남"이라고 했고,
    시간 안에 우선순위가 아님. `app_logs`/`github_logs` 등 테이블 설계는 이미 돼 있으니 나중에 붙인다.
-6. **미포함(알고 넘어가는 갭)**: F4 "질문 이력 목록"을 실제로 서버에서 조회하는 `GET /api/questions`가
+6. **`POST /api/cards`** — F1 "카드로 등록"의 유일한 저장 경로. 이게 없으면 F1이 백엔드에 아무것도 못 남김.
+7. **미포함(알고 넘어가는 갭)**: F4 "질문 이력 목록"을 실제로 서버에서 조회하는 `GET /api/questions`가
    없다 — 지금 `js/questions.js`는 질문 목록 자체를 정적 HTML에서 DOM으로 긁어오는 방식이라(답변만 API로
    저장), 목록까지 실제 데이터로 바꾸려면 이 GET도 추가해야 한다. `screen-features.md`의 "질문 이력 정렬"
-   요구사항도 이게 있어야 가능. 시간 남으면 4번 다음으로 추가.
+   요구사항도 이게 있어야 가능.
+8. **로그인/세션 없음**: `userSeq`를 프론트가 어떻게 아는지에 대한 실제 인증 체계가 없다. 지금은 "유저
+   목록 중 한 명을 로그인한 것으로 가정"하고 진행하기로 함 — 프론트에서 고정 `userSeq`(또는 간단한 유저
+   선택 UI)로 처리.
 
 ---
 
@@ -83,7 +87,33 @@
 - **`related` 필드는 없다.** `related_cards` 테이블 자체가 스키마에 없고(demo.html 목데이터에만 있던 죽은
   필드 — `js/context.js`도 이 값을 렌더링하지 않는다), API에도 넣지 않는다.
 
-## 3. `POST /api/ownership-transitions` — F2 이관
+## 3. `POST /api/cards` — F1 카드 등록
+
+요청:
+```json
+{
+  "userSeq": 1,
+  "solution": "그룹웨어",
+  "category": "인증/로그인",
+  "title": "OAuth 전환 검토",
+  "decisionContent": "...",
+  "reasonContent": "...",
+  "evidenceContent": "...",
+  "evidenceSource": "...",
+  "sourceApp": "Slack",
+  "startedAt": "2026-08-25"
+}
+```
+응답:
+```json
+{ "cardSeq": 12 }
+```
+- `userSeq`(담당자)만 필수, 나머지는 전부 nullable — F1 등록 폼 안내("확인되지 않은 항목은 비워두고
+  나중에 채울 수 있습니다")와 동일하게 동작.
+- F1의 "담당(누가)" 입력이 현재 자유 텍스트(이름)인데, 이 API는 `userSeq`(FK)를 받는다 — 프론트에서
+  이름 대신 `GET /api/users`로 받은 실제 사용자 선택으로 바꿔야 함.
+
+## 4. `POST /api/ownership-transitions` — F2 이관
 
 요청:
 ```json
@@ -101,7 +131,7 @@
 - `cards`는 이 API에서 전혀 갱신하지 않는다 — `GET /api/cards?userSeq=` 쪽에서 매 조회 시점에 체인을 재귀로
   병합해서 반영한다(1번 절 참고).
 
-## 4. `POST /api/questions` — F4 질문 등록
+## 5. `POST /api/questions` — F4 질문 등록
 
 요청:
 ```json
@@ -113,7 +143,7 @@
 ```
 - `userSeq`(질문자) 필수 — `questions.user_seq`가 NOT NULL이라 빠지면 안 됨.
 
-## 5. `POST /api/questions/{questionSeq}/answers` — F4 답변 등록
+## 6. `POST /api/questions/{questionSeq}/answers` — F4 답변 등록
 
 요청:
 ```json
@@ -126,7 +156,7 @@
 - `userSeq`(답변자, 기존 담당자 또는 관리자) 필수 — `question_answers.user_seq`도 NOT NULL.
 - 등록 성공 시 서버에서 `questions.is_answer = 1`로 갱신.
 
-## 6. `GET /api/users` — F2 담당자 선택 피커용 사용자 목록
+## 7. `GET /api/users` — F2 담당자 선택 피커용 사용자 목록
 
 이미 구현된 `UserController`(`src/main/kotlin/com/example/unithon/UserController.kt`)의 엔드포인트.
 `js/handoff.js`가 지금 `owners`/`handoffCandidates`를 인라인 상수로 갖고 있는데, F2 화면에서
