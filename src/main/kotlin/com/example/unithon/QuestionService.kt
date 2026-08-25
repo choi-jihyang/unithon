@@ -11,6 +11,7 @@ data class QuestionListItem(
     val userName: String,
     val cardSeq: Long?,
     val cardTitle: String?,
+    val solution: String?,
     val category: String?,
     val targetPart: String,
     val content: String,
@@ -37,6 +38,7 @@ class QuestionService(
     fun askQuestion(
         userSeq: Long,
         cardSeq: Long?,
+        solution: String?,
         category: String?,
         targetPart: String,
         content: String,
@@ -44,6 +46,7 @@ class QuestionService(
         Question(
             userSeq = userSeq,
             cardSeq = cardSeq,
+            solution = solution,
             category = category,
             targetPart = targetPart,
             content = content,
@@ -82,6 +85,7 @@ class QuestionService(
                 userName = userNames[q.userSeq] ?: "알수없음",
                 cardSeq = q.cardSeq,
                 cardTitle = q.cardSeq?.let { cardTitles[it] },
+                solution = q.solution,
                 category = q.category,
                 targetPart = q.targetPart,
                 content = q.content,

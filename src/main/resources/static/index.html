@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="card">
-            <div class="integ-row">
+            <div class="integ-row" data-source="GITHUB">
                 <div class="integ-left">
                     <div class="integ-icon">GH</div>
                     <div>
@@ -52,7 +52,7 @@
                 </div>
                 <div class="toggle on"></div>
             </div>
-            <div class="integ-row">
+            <div class="integ-row" data-source="JIRA">
                 <div class="integ-left">
                     <div class="integ-icon">JR</div>
                     <div>
@@ -66,7 +66,7 @@
                 </div>
                 <div class="toggle on"></div>
             </div>
-            <div class="integ-row">
+            <div class="integ-row" data-source="FIGMA">
                 <div class="integ-left">
                     <div class="integ-icon">FG</div>
                     <div>
@@ -81,7 +81,7 @@
                 </div>
                 <div class="toggle on"></div>
             </div>
-            <div class="integ-row">
+            <div class="integ-row" data-source="SLACK">
                 <div class="integ-left">
                     <div class="integ-icon">SL</div>
                     <div>
@@ -95,7 +95,7 @@
                 </div>
                 <div class="toggle"></div>
             </div>
-            <div class="integ-row">
+            <div class="integ-row" data-source="SENTRY">
                 <div class="integ-left">
                     <div class="integ-icon">SN</div>
                     <div>
@@ -110,7 +110,7 @@
                 </div>
                 <div class="toggle"></div>
             </div>
-            <div class="integ-row">
+            <div class="integ-row" data-source="LINEAR">
                 <div class="integ-left">
                     <div class="integ-icon">LN</div>
                     <div>
@@ -168,7 +168,6 @@
                 </div>
                 <div class="uq-actions-row">
                     <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
                         <button class="classify-btn">분류</button>
                     </div>
                 </div>
@@ -197,7 +196,6 @@
                 </div>
                 <div class="uq-actions-row">
                     <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
                         <button class="classify-btn">분류</button>
                     </div>
                 </div>
@@ -228,7 +226,6 @@
                 </div>
                 <div class="uq-actions-row">
                     <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
                         <button class="classify-btn">분류</button>
                     </div>
                 </div>
@@ -257,7 +254,6 @@
                 </div>
                 <div class="uq-actions-row">
                     <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
                         <button class="classify-btn">분류</button>
                     </div>
                 </div>
@@ -288,7 +284,6 @@
                 </div>
                 <div class="uq-actions-row">
                     <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
                         <button class="classify-btn">분류</button>
                     </div>
                 </div>
@@ -319,7 +314,6 @@
                 </div>
                 <div class="uq-actions-row">
                     <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
                         <button class="classify-btn">분류</button>
                     </div>
                 </div>
@@ -350,7 +344,6 @@
                 </div>
                 <div class="uq-actions-row">
                     <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
                         <button class="classify-btn">분류</button>
                     </div>
                 </div>
@@ -381,7 +374,6 @@
                 </div>
                 <div class="uq-actions-row">
                     <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
                         <button class="classify-btn">분류</button>
                     </div>
                 </div>
@@ -481,34 +473,10 @@
             </div>
         </div>
         <div class="card owner-list-card" id="ownerList">
-            <div class="owner-row selected" data-owner="kim">
-                <div class="owner-left">
-                    <div class="avatar owner-avatar">김</div>
-                    <div>
-                        <b>김도현 백엔드 개발자</b>
-                        <div class="owner-sub">담당 프로젝트 3건</div>
-                    </div>
-                </div>
-                <div class="owner-right">
-                    <span class="status-chip chip-leaving">퇴사예정</span>
-                </div>
-            </div>
-            <div class="owner-row not-selectable" data-owner="jung">
-                <div class="owner-left">
-                    <div class="avatar owner-avatar">정</div>
-                    <div>
-                        <b>정하은 백엔드 개발자</b>
-                        <div class="owner-sub">담당 프로젝트 5건</div>
-                    </div>
-                </div>
-                <div class="owner-right">
-                    <span class="status-chip chip-active">재직중</span>
-                </div>
-            </div>
+            <!-- JS(handoff.js)가 GET /api/users 응답으로 렌더링합니다 -->
         </div>
         <div class="perm-note">
-            일반 구성원 계정으로 접속 시 행 선택이 비활성화됩니다 — 이관은
-            팀장/관리자 권한만 실행 가능
+            이관은 팀장/관리자 권한 계정에서 실행하세요
         </div>
     </div>
 
@@ -711,7 +679,7 @@
                 </div>
                 <div class="form-field">
                     <label class="form-label">어떤 부분에 대한 질문인가요</label>
-                    <select class="select-input">
+                    <select class="select-input" id="questionTargetPartSelect">
                         <option>결정 내용</option>
                         <option>결정 이유</option>
                         <option>근거 자료</option>
@@ -721,9 +689,11 @@
             <div class="q-input-row">
                 <input
                         class="form-input"
+                        id="questionContentInput"
                         placeholder="궁금한 점을 남겨주세요"
-                /><button class="btn sm">질문 등록</button>
+                /><button class="btn sm" id="questionSubmitBtn">질문 등록</button>
             </div>
+            <div id="questionSubmitFeedback"></div>
             <div class="add-cat-link">+ 목록에 없는 유형이라면 직접 추가</div>
         </div>
     </div>

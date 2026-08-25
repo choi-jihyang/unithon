@@ -40,7 +40,7 @@ class User(
     val departmentName: String? = null,
 
     @Column(nullable = false)
-    val isUse: Boolean = true,
+    var isUse: Boolean = true,
 
     @Column(nullable = false)
     val createdAt: LocalDateTime = LocalDateTime.now(),
