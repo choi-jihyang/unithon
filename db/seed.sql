@@ -341,39 +341,41 @@ INSERT INTO user_map_app (user_seq, source_type, enabled, updated_at) VALUES
   ((SELECT user_seq FROM users WHERE user_id = 'kimdohyun'), 'SENTRY', 0, NOW()),
   ((SELECT user_seq FROM users WHERE user_id = 'kimdohyun'), 'LINEAR', 0, NOW());
 
--- app_logs — F1 미분류 큐(김도현 기준). Slack 메시지는 원문 raw 테이블이 아직 없어
--- (schema.md상 Slack/Sentry/Linear 원문 테이블은 보류 상태) source_seq는 NULL.
--- 미분류 기준: 카드 제목을 특정할 수 없는 일상 대화/질문성 메시지라 title=NULL, status=UNCLASSIFIED로 둔다.
+-- app_logs — F1 미분류 큐(김도현 기준). Slack은 개인 DM 없이 모니터링 봇만 연동하는
+-- 설계라 사람 대화체가 아니라 봇이 올리는 경고 메시지, Sentry는 에러/정보 로그 형태로 채운다.
+-- 원문 raw 테이블(slack_logs/sentry_logs)은 아직 없어(schema.md상 보류 상태) source_seq는 NULL.
+-- 미분류 기준: 업무 관련 로그이긴 하나 결정/이유/근거로 정리할 사람의 판단이 없는
+-- 자동 생성 경고/로그라 title=NULL, status=UNCLASSIFIED로 둔다.
 INSERT INTO app_logs (
   user_seq, source_type, title, decision_content, status, created_at
 ) VALUES
   (
     (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
-    'SLACK', NULL, '이거 롤백해야 할 것 같은데 확인 부탁드려요', 'UNCLASSIFIED',
+    'SLACK', NULL, '[Warning] Disk usage 87% on iso-audit-db-01\nFree space: 12GB / 100GB\nPredicted full in ~5 days at current rate.', 'UNCLASSIFIED',
     '2026-08-24 10:20:00'
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
-    'SLACK', NULL, '회의록 링크 여기 공유드립니다', 'UNCLASSIFIED',
+    'SENTRY', NULL, '[Error] NullPointerException at OrderService.processPayment (line 142)\nOccurred 12 times in the last 1 hour', 'UNCLASSIFIED',
     '2026-08-23 15:05:00'
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
-    'SLACK', NULL, '점심 뭐 드실래요 근처에 새로 생긴 데 있던데', 'UNCLASSIFIED',
+    'SLACK', NULL, '[Warning] CPU usage 92% on mes-platform-worker-03\nSustained for 10 minutes', 'UNCLASSIFIED',
     '2026-08-22 12:10:00'
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
-    'SLACK', NULL, '내일 3시에 배포 가능하신가요', 'UNCLASSIFIED',
+    'SENTRY', NULL, '[Error] Connection timeout: figma-webhook-listener\nRetry attempt 3/3 failed', 'UNCLASSIFIED',
     '2026-08-21 09:40:00'
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
-    'SLACK', NULL, '그거 OAuth 쪽으로 바꾸는 게 나을 것 같은데요', 'UNCLASSIFIED',
+    'SLACK', NULL, '[Info] Memory usage back to normal on groupware-api-02\nPeak was 94%, now 61%', 'UNCLASSIFIED',
     '2026-08-20 14:15:00'
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
-    'SLACK', NULL, '이 로그 좀 봐주실 수 있나요 뭔가 이상해서요', 'UNCLASSIFIED',
+    'SENTRY', NULL, '[Error] 502 Bad Gateway spike detected on /api/cards\n15 occurrences in 5 minutes', 'UNCLASSIFIED',
     '2026-08-19 11:30:00'
   );
