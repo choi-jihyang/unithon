@@ -1,5 +1,5 @@
 /**
- * handoff.js — F2 이관 (담당자 선택 → 확인)
+ * handoff.js — F2 이관 (담당자 선택 → 확인 → 확정)
  */
     const owners = {
         kim: {
@@ -21,6 +21,28 @@
     ];
 
     let pendingHandoffOwnerKey = null;
+    let pendingHandoffCandidateKey = null;
+
+    // GET /api/users로 받은 실사용자 목록. owners/handoffCandidates는 데모용
+    // 표시 이름(직함 포함)이라, 실제 API 호출에 필요한 userSeq는 이 목록에서
+    // 이름이 접두 일치하는 사용자를 찾아 매핑한다(고정 ID를 하드코딩하지 않음).
+    let userList = [];
+
+    async function loadUsers() {
+        try {
+            const res = await fetch("/api/users");
+            if (!res.ok) throw new Error(`status ${res.status}`);
+            userList = await res.json();
+        } catch (e) {
+            console.warn("[F2] /api/users 조회 실패:", e.message);
+        }
+    }
+    loadUsers();
+
+    function findUserSeq(displayName) {
+        const user = userList.find((u) => displayName.startsWith(u.name));
+        return user ? user.userSeq : null;
+    }
 
     function renderHandoffCandidates() {
         document.getElementById("handoffCandidateList").innerHTML =
@@ -64,10 +86,22 @@
         document.getElementById("handoffPickerOverlay").classList.remove("show");
     }
 
+    function renderHandoffFeedback(message, type) {
+        const el = document.getElementById("handoffFeedback");
+        if (!el) return;
+        if (!message) {
+            el.innerHTML = "";
+            return;
+        }
+        el.innerHTML = `<div class="handoff-feedback ${type}">${message}</div>`;
+    }
+
     function confirmHandoffTarget(candidateKey) {
         const owner = owners[pendingHandoffOwnerKey];
         const candidate = handoffCandidates.find((c) => c.key === candidateKey);
         if (!owner || !candidate) return;
+        pendingHandoffCandidateKey = candidateKey;
+        renderHandoffFeedback("", null);
 
         document.getElementById("handoffAvatar").textContent = owner.initial;
         document.getElementById("handoffName").textContent = owner.name;
@@ -87,10 +121,65 @@
             )
             .join("");
 
+        const btn = document.getElementById("handoffConfirmBtn");
+        btn.disabled = false;
+        btn.textContent = "담당자 이관하기";
+
         document.getElementById("handoffPlaceholder").style.display = "none";
         document.getElementById("handoffFilled").style.display = "flex";
 
         closeHandoffPicker();
+    }
+
+    async function submitHandoffConfirm() {
+        const owner = owners[pendingHandoffOwnerKey];
+        const candidate = handoffCandidates.find(
+            (c) => c.key === pendingHandoffCandidateKey,
+        );
+        if (!owner || !candidate) return;
+
+        const oldUserSeq = findUserSeq(owner.name);
+        const newUserSeq = findUserSeq(candidate.name);
+        if (!oldUserSeq || !newUserSeq) {
+            renderHandoffFeedback(
+                "사용자 정보를 아직 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
+                "error",
+            );
+            return;
+        }
+
+        const btn = document.getElementById("handoffConfirmBtn");
+        btn.disabled = true;
+        btn.textContent = "이관 처리 중…";
+        renderHandoffFeedback("", null);
+
+        try {
+            const res = await fetch("/api/ownership-transitions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    oldUserSeq,
+                    newUserSeq,
+                    transitionedByUserSeq: getCurrentUserSeq(),
+                }),
+            });
+            if (!res.ok) throw new Error(`status ${res.status}`);
+            await res.json();
+
+            btn.textContent = "이관 완료";
+            renderHandoffFeedback(
+                `${owner.name}의 담당 프로젝트가 ${candidate.name}에게 이관되었습니다.`,
+                "success",
+            );
+        } catch (e) {
+            console.warn("[F2] 이관 확정 실패:", e.message);
+            btn.disabled = false;
+            btn.textContent = "담당자 이관하기";
+            renderHandoffFeedback(
+                "이관 처리에 실패했습니다. 잠시 후 다시 시도해주세요.",
+                "error",
+            );
+        }
     }
 
     document.querySelectorAll("#ownerList .owner-row").forEach((row) => {
@@ -104,5 +193,8 @@
         .addEventListener("click", (e) => {
             if (e.target.id === "handoffPickerOverlay") closeHandoffPicker();
         });
+    document
+        .getElementById("handoffConfirmBtn")
+        .addEventListener("click", submitHandoffConfirm);
 
     renderHandoffCandidates();

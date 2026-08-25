@@ -550,6 +550,7 @@
                         <div class="handoff-empty-note">
                             💡 별도의 인수인계 문서 작성 없이 즉시 반영됩니다
                         </div>
+                        <div id="handoffFeedback"></div>
                     </div>
                 </div>
             </div>
@@ -761,73 +762,7 @@
             </div>
         </div>
 
-        <div class="cat-filter-bar">
-            <div class="cat-chip active">전체 <span class="count">6</span></div>
-            <div class="cat-chip">인증/로그인 <span class="count">2</span></div>
-            <div class="cat-chip">결제/정산 <span class="count">2</span></div>
-            <div class="cat-chip">인프라/배포 <span class="count">1</span></div>
-            <div class="cat-chip">
-                데이터 파이프라인 <span class="count">1</span>
-            </div>
-        </div>
-
-        <div class="cat-group">
-            <div class="cat-group-head">
-                <div class="cat-group-title">인증/로그인</div>
-                <div class="cat-group-count">2건</div>
-            </div>
-            <div class="cat-group-items">
-                <div class="q-list-item">
-                    인증 시스템 — "OAuth2로 전환하면서 기존 세션 기반 API 클라이언트도
-                    같이 마이그레이션해야 하나요?"<span class="node-type-tag decision"
-                >결정</span
-                >
-                    <div class="q-meta">정하은 · 2026.08.25 09:31</div>
-                </div>
-                <div class="q-list-item">
-                    로그인 리다이렉트 — "왜 콜백 URL을 화이트리스트 방식으로
-                    바꿨나요?"<span class="node-type-tag decision">결정</span>
-                    <div class="q-meta">정하은 · 2026.08.25 10:02</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="cat-group">
-            <div class="cat-group-head">
-                <div class="cat-group-title">결제/정산</div>
-                <div class="cat-group-count">2건</div>
-            </div>
-            <div class="cat-group-items">
-                <div class="q-list-item">
-                    정기결제 로직 — "재시도 정책이 3회로 정해진 근거가 있나요?"<span
-                        class="node-type-tag evidence"
-                >근거</span
-                >
-                    <div class="q-meta">정하은 · 2026.08.25 11:14</div>
-                </div>
-                <div class="q-list-item">
-                    환불 처리 — "환불 승인 단계를 없앤 이유가 뭔가요?"<span
-                        class="node-type-tag reason"
-                >이유</span
-                >
-                    <div class="q-meta">정하은 · 2026.08.26 09:02</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="cat-group">
-            <div class="cat-group-head">
-                <div class="cat-group-title">인프라/배포</div>
-                <div class="cat-group-count">1건</div>
-            </div>
-            <div class="cat-group-items">
-                <div class="q-list-item">
-                    배포 파이프라인 — "CI 단계를 줄인 게 속도 때문인가요, 비용
-                    때문인가요?"<span class="node-type-tag reason">이유</span>
-                    <div class="q-meta">정하은 · 2026.08.26 14:20</div>
-                </div>
-            </div>
-        </div>
+        <div id="questionHistoryList"></div>
     </div>
 
     <div class="case-modal-overlay" id="qaModalOverlay">
@@ -853,6 +788,7 @@
                         placeholder="답변을 입력하세요"
                 /><button class="btn sm" id="qaAnswerBtn">답변 등록</button>
             </div>
+            <div id="qaFeedback"></div>
         </div>
     </div>
 </section>
