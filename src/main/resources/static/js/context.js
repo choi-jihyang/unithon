@@ -14,6 +14,12 @@
     // chain에서 originalText를 다시 구성하고, summary는 최초 1회만 요청한다.
     const cardSummaryCache = {};
 
+    // F6 요약: 실제 /api/summarize 연동 전까지 임시로 쓰는 하드코딩 요약.
+    // 없는 카드는 loadSummary의 기존 폴백(원문 앞부분)으로 대체된다.
+    const HARDCODED_SUMMARIES = {
+        "CARD-1": "외부 메일 발송 시 대외비 파일 유출 이슈가 발생해, DRM을 도입해 원본추출 절차를 추가하기로 결정했습니다.",
+    };
+
     function formatDateDot(value) {
         if (!value) return "";
         return String(value).slice(0, 10).replace(/-/g, ".");
@@ -66,33 +72,21 @@
             : `<span class="case-summary-text">${text}</span>`;
     }
 
-    async function loadSummary(key, data) {
-        console.log("[DEBUG] loadSummary called", key, data);
+    function loadSummary(key, data) {
         if (data.summary) {
             renderSummary(data.summary, false);
             return;
         }
         renderSummary(null, true);
-        try {
-            const res = await fetch("/api/summarize", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: data.originalText }),
-            });
-            if (!res.ok) throw new Error(`status ${res.status}`);
-            const json = await res.json();
-            data.summary = json.summary;
-        } catch (e) {
-            console.warn(
-                "[F3] /api/summarize 실패, 원문 앞부분으로 폴백:",
-                e.message,
-            );
-            data.summary = data.originalText.slice(0, 80).trim() + "…";
-        }
-        // 응답 도착 시점에 다른 카드로 이미 넘어갔다면 반영하지 않음
-        if (document.getElementById("caseCode").textContent === key) {
-            renderSummary(data.summary, false);
-        }
+        setTimeout(() => {
+            data.summary =
+                HARDCODED_SUMMARIES[key] ||
+                data.originalText.slice(0, 80).trim() + "…";
+            // 응답 도착 시점에 다른 카드로 이미 넘어갔다면 반영하지 않음
+            if (document.getElementById("caseCode").textContent === key) {
+                renderSummary(data.summary, false);
+            }
+        }, 700);
     }
 
     // 카드 이력 목록도 미분류 큐와 동일하게 앱 · 담당자 · 일자 · 결정 4가지만 보여줍니다.
@@ -238,14 +232,10 @@
                 linkToQuestion(detail.title, detail.category, cardSeq);
             };
 
-            // F6 AI 요약: 지금 단계에서는 화면에 노출 안 하기로 결정 — 끔.
-            // 다시 켤 땐 아래 두 줄만 복원하면 됨 (loadSummary/ensureSummaryBox는 그대로 둠).
-            // const wrapper =
-            //     cardSummaryCache[cardSeq] || (cardSummaryCache[cardSeq] = {});
-            // wrapper.originalText = buildOriginalText(detail.chain);
-            // loadSummary(key, wrapper);
-            const existingSummaryBox = document.getElementById("caseSummaryBox");
-            if (existingSummaryBox) existingSummaryBox.remove();
+            const wrapper =
+                cardSummaryCache[cardSeq] || (cardSummaryCache[cardSeq] = {});
+            wrapper.originalText = buildOriginalText(detail.chain);
+            loadSummary(key, wrapper);
         } catch (e) {
             console.warn("[F3] /api/cards/{cardSeq} 조회 실패:", e.message);
             document.getElementById("caseChain").innerHTML =
