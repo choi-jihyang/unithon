@@ -167,47 +167,54 @@ INSERT INTO figma_logs (
 -- (보안이슈 조치/배포 파이프라인/CI 캐시 최적화/접근 로그 감사 자동화)를 원문으로 삼는다.
 -- title=해당 카드의 decision_content, content=reason_content와 동일한 문구 —
 -- 원문 로그 → app_logs → cards 3단이 같은 내용을 가리키도록.
+-- url(html_url)은 api-contract.md GitHub 예시에 명시된 실제 응답 필드라 채워 넣는다.
 INSERT INTO github_logs (
-  user_seq, repo_name, type, title, content, author, external_ref, occurred_at, created_at
+  user_seq, repo_name, type, title, content, author, external_ref, url, occurred_at, created_at
 ) VALUES
   (
     (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
     'groupware', 'PR',
     '외부로 메일 발송 시 대외비 파일 유출 이슈 발생',
     'DRM 도입하여 외부발송 건은 원본추출 절차를 추가해 관리할 필요가 있다고 판단',
-    '김도현', '#142', '2025-03-05 10:00:00', NOW()
+    '김도현', '#142', 'https://github.com/example-corp/groupware/pull/142',
+    '2025-03-05 10:00:00', NOW()
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'leeseojun'),
     'mes-platform', 'PR',
     'CI 단계를 5단계에서 3단계로 축소',
     '빌드 시간 단축이 목적이며, 테스트 커버리지는 별도 파이프라인으로 분리해 유지',
-    '이서준', '#158', '2025-02-20 15:30:00', NOW()
+    '이서준', '#158', 'https://github.com/example-corp/mes-platform/pull/158',
+    '2025-02-20 15:30:00', NOW()
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'leeseojun'),
     'mes-platform', 'COMMIT',
     '의존성 설치 단계에 캐시 계층 추가',
     '동일 의존성을 매번 재설치하며 낭비되는 CI 시간을 줄이기 위함',
-    '이서준', 'a1b2c3d', '2025-08-01 09:15:00', NOW()
+    '이서준', 'a1b2c3d', 'https://github.com/example-corp/mes-platform/commit/a1b2c3d',
+    '2025-08-01 09:15:00', NOW()
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'parkjimin'),
     'iso-audit', 'PR',
     '주요 시스템 접근 로그를 매일 자동 취합해 감사 리포트로 생성',
     'ISO 27001 심사 대비, 수기로 로그를 취합하던 절차에서 누락 사고가 발생함',
-    '박지민', '#171', '2026-08-25 08:00:00', NOW()
+    '박지민', '#171', 'https://github.com/example-corp/iso-audit/pull/171',
+    '2026-08-25 08:00:00', NOW()
   );
 
 -- Jira 원본 수집 데이터(티켓). cards 시드 중 새로 추가된 "지원자 이력서 자동 파기
 -- 정책 도입"(채용시스템, Jira) 카드를 원문으로 삼는다. summary=카드 title,
 -- description=decision_content+reason_content를 이어붙인 문구.
+-- project_key는 fields.project.key 필드(문서 5번 섹션, 프로젝트 매칭용) — issue_key
+-- 접두어(PRIV)와 동일하게 채용시스템 프로젝트 코드로 넣는다.
 INSERT INTO jira_logs (
-  user_seq, issue_key, summary, description, status, priority, assignee, occurred_at, created_at
+  user_seq, issue_key, project_key, summary, description, status, priority, assignee, occurred_at, created_at
 ) VALUES
   (
     (SELECT user_seq FROM users WHERE user_id = 'junghaeun'),
-    'PRIV-021', '지원자 이력서 자동 파기 정책 도입',
+    'PRIV-021', 'PRIV', '지원자 이력서 자동 파기 정책 도입',
     '불합격자 이력서를 보관 6개월 후 자동 파기하도록 채용시스템에 정책 적용. 개인정보보호법상 채용 목적 달성 후 이력서를 무기한 보관하면 안 된다는 컴플라이언스 이슈가 지적됨.',
     'Resolved', 'High', '정하은', '2026-07-10 09:30:00', NOW()
   );

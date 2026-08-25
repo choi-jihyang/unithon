@@ -16,7 +16,8 @@ import java.time.LocalDateTime
  * 필드는 docs/api/jira-integration-api.md 4번 섹션 기준: key → issueKey,
  * fields.summary → summary, fields.description(ADF 파싱된 평문) → description,
  * fields.status.name → status, fields.priority.name → priority,
- * fields.assignee.displayName → assignee, fields.created → occurredAt.
+ * fields.assignee.displayName → assignee, fields.created → occurredAt,
+ * fields.project.key → projectKey(프로젝트 매칭용 — 문서 5번 섹션 참고).
  */
 @Entity
 @Table(name = "jira_logs")
@@ -28,6 +29,8 @@ class JiraLog(
     val userSeq: Long? = null,
 
     val issueKey: String? = null,
+
+    val projectKey: String? = null,
 
     val summary: String? = null,
 
