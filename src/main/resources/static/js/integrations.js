@@ -1,6 +1,6 @@
 /**
  * integrations.js — F1 연동수집 (연동 설정 토글 / 미분류 큐 → 카드 등록)
- * caseData/createHistoryRow는 context.js(F3)에 정의되어 있다.
+ * 카드 등록은 POST /api/cards로 저장하고, context.js(F3)의 loadCardList()를 호출해 목록을 갱신한다.
  */
     const unclassifiedMoreBtn = document.getElementById(
         "unclassifiedMoreBtn",
@@ -139,7 +139,6 @@
     }
 
     // ===== 미분류 큐 → 수동 카드 등록 =====
-    let manualCaseSeq = 0;
     let pendingUnclassifiedCard = null;
 
     function openRegisterModal({ text, source, owner, sourceCard }) {
@@ -213,14 +212,9 @@
             if (e.target.id === "registerModalOverlay") closeRegisterModal();
         });
 
-    document.getElementById("registerSaveBtn").addEventListener("click", () => {
-        const project =
-            document.getElementById("registerProjectInput").value.trim() ||
-            "솔루션 미지정";
-        const title =
-            document.getElementById("registerTitleInput").value.trim() ||
-            "제목 미입력 카드";
-        const owner = document.getElementById("registerOwnerInput").value.trim();
+    document.getElementById("registerSaveBtn").addEventListener("click", async () => {
+        const project = document.getElementById("registerProjectInput").value.trim();
+        const title = document.getElementById("registerTitleInput").value.trim();
         const decision = document
             .getElementById("registerDecisionInput")
             .value.trim();
@@ -234,27 +228,27 @@
             .getElementById("registerSourceTag")
             .textContent.trim();
 
-        manualCaseSeq += 1;
-        const key = `PJ-M${String(manualCaseSeq).padStart(2, "0")}`;
+        try {
+            const res = await fetch("/api/cards", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userSeq: getCurrentUserSeq(),
+                    solution: project || null,
+                    title: title || null,
+                    decisionContent: decision || null,
+                    reasonContent: reason || null,
+                    evidenceContent: evidence || null,
+                    sourceApp: source || null,
+                }),
+            });
+            if (!res.ok) throw new Error("카드 등록 실패");
 
-        caseData[key] = {
-            title,
-            project,
-            app: source,
-            tags: [source, `등록 ${todayLabel}`],
-            category: "미분류",
-            afterView: "관련 질문 없음",
-            related: [],
-            chain: [
-                { tag: "담당", name: owner, date: todayLabel },
-                { tag: "결정", name: decision, date: todayLabel },
-                { tag: "이유", name: reason, date: todayLabel },
-                { tag: "근거", name: evidence, date: todayLabel },
-            ],
-        };
-
-        document.getElementById("caseHistoryList").appendChild(createHistoryRow(key));
-
-        if (pendingUnclassifiedCard) pendingUnclassifiedCard.remove();
-        closeRegisterModal();
+            if (pendingUnclassifiedCard) pendingUnclassifiedCard.remove();
+            closeRegisterModal();
+            if (typeof loadCardList === "function") loadCardList();
+        } catch (err) {
+            console.error("카드 등록 실패", err);
+            alert("카드 등록에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        }
     });
