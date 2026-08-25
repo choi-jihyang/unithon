@@ -31,3 +31,23 @@ data class ChainNode(
     val date: String?,
     val tooltip: String? = null,
 )
+
+/**
+ * POST /api/cards 요청 — F1 "카드로 등록"(수동 결정 기록)의 유일한 저장 경로.
+ * userSeq 외 전부 nullable — cards 테이블 그대로(schema.md 참고), 확인 안 된 항목은
+ * 비워두고 나중에 채울 수 있다.
+ */
+data class CreateCardRequest(
+    val userSeq: Long,
+    val solution: String? = null,
+    val category: String? = null,
+    val title: String? = null,
+    val decisionContent: String? = null,
+    val reasonContent: String? = null,
+    val evidenceContent: String? = null,
+    val evidenceSource: String? = null,
+    val sourceApp: String? = null,
+    val startedAt: LocalDate? = null,
+)
+
+data class CreateCardResponse(val cardSeq: Long)

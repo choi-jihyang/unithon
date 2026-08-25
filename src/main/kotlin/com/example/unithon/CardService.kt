@@ -74,4 +74,23 @@ class CardService(
             chain = chain,
         )
     }
+
+    /** F1 "카드로 등록". userSeq(담당자)만 필수, 나머지는 비워도 된다. */
+    fun createCard(request: CreateCardRequest): CreateCardResponse {
+        val saved = cardRepository.save(
+            Card(
+                userSeq = request.userSeq,
+                solution = request.solution,
+                category = request.category,
+                title = request.title,
+                decisionContent = request.decisionContent,
+                reasonContent = request.reasonContent,
+                evidenceContent = request.evidenceContent,
+                evidenceSource = request.evidenceSource,
+                sourceApp = request.sourceApp,
+                startedAt = request.startedAt,
+            ),
+        )
+        return CreateCardResponse(cardSeq = requireNotNull(saved.seq))
+    }
 }
