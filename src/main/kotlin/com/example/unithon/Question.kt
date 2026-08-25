@@ -21,6 +21,8 @@ class Question(
 
     val cardSeq: Long? = null,
 
+    val solution: String? = null,
+
     val category: String? = null,
 
     @Column(nullable = false)

@@ -15,6 +15,13 @@
         EVIDENCE: { text: "근거", cls: "evidence" },
     };
 
+    // "어떤 부분에 대한 질문인가요" select 라벨(한글) -> 서버가 기대하는 targetPart 값.
+    const targetPartValueMap = {
+        "결정 내용": "DECISION",
+        "결정 이유": "REASON",
+        "근거 자료": "EVIDENCE",
+    };
+
     function targetPartTag(targetPart) {
         return targetPartTagMap[targetPart] || { text: targetPart || "", cls: "" };
     }
@@ -30,9 +37,10 @@
     function renderQuestionItem(q) {
         const tag = targetPartTag(q.targetPart);
         const titlePrefix = q.cardTitle ? `${q.cardTitle} — ` : "";
+        const solutionMeta = q.solution ? `${q.solution} · ` : "";
         return `<div class="q-list-item" data-question-seq="${q.questionSeq}">
                     ${titlePrefix}"${q.content}"<span class="node-type-tag ${tag.cls}">${tag.text}</span>
-                    <div class="q-meta">${q.userName} · ${formatDateTimeDot(q.createdAt)}</div>
+                    <div class="q-meta">${solutionMeta}${q.userName} · ${formatDateTimeDot(q.createdAt)}</div>
                 </div>`;
     }
 
@@ -187,6 +195,65 @@
             btn.disabled = false;
         }
     }
+
+    function renderQuestionSubmitFeedback(message) {
+        const el = document.getElementById("questionSubmitFeedback");
+        if (!el) return;
+        el.innerHTML = message ? `<div class="api-error-note">${message}</div>` : "";
+    }
+
+    async function submitNewQuestion() {
+        const input = document.getElementById("questionContentInput");
+        const content = input.value.trim();
+        if (!content) return;
+
+        const solution = document.getElementById("projectSelect").value;
+        const category = document.getElementById("projectTypeSelect").value;
+        const targetPartLabel = document.getElementById(
+            "questionTargetPartSelect",
+        ).value;
+        const targetPart = targetPartValueMap[targetPartLabel] || "DECISION";
+
+        const btn = document.getElementById("questionSubmitBtn");
+        btn.disabled = true;
+        renderQuestionSubmitFeedback("");
+
+        try {
+            const res = await fetch("/api/questions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userSeq: getCurrentUserSeq(),
+                    cardSeq: null,
+                    solution,
+                    category,
+                    targetPart,
+                    content,
+                }),
+            });
+            if (!res.ok) throw new Error(`status ${res.status}`);
+            await res.json();
+
+            input.value = "";
+            await loadQuestions();
+        } catch (e) {
+            console.warn("[F4] 질문 등록 실패:", e.message);
+            renderQuestionSubmitFeedback(
+                "질문 등록에 실패했습니다. 잠시 후 다시 시도해주세요.",
+            );
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    document
+        .getElementById("questionSubmitBtn")
+        .addEventListener("click", submitNewQuestion);
+    document
+        .getElementById("questionContentInput")
+        .addEventListener("keydown", (e) => {
+            if (e.key === "Enter") submitNewQuestion();
+        });
 
     loadQuestions();
 

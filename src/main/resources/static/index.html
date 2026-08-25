@@ -711,7 +711,7 @@
                 </div>
                 <div class="form-field">
                     <label class="form-label">어떤 부분에 대한 질문인가요</label>
-                    <select class="select-input">
+                    <select class="select-input" id="questionTargetPartSelect">
                         <option>결정 내용</option>
                         <option>결정 이유</option>
                         <option>근거 자료</option>
@@ -721,9 +721,11 @@
             <div class="q-input-row">
                 <input
                         class="form-input"
+                        id="questionContentInput"
                         placeholder="궁금한 점을 남겨주세요"
-                /><button class="btn sm">질문 등록</button>
+                /><button class="btn sm" id="questionSubmitBtn">질문 등록</button>
             </div>
+            <div id="questionSubmitFeedback"></div>
             <div class="add-cat-link">+ 목록에 없는 유형이라면 직접 추가</div>
         </div>
     </div>

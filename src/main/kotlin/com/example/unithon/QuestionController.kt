@@ -11,6 +11,7 @@ import java.time.LocalDateTime
 data class QuestionRequest(
     val userSeq: Long,
     val cardSeq: Long?,
+    val solution: String?,
     val category: String?,
     val targetPart: String,
     val content: String,
@@ -30,6 +31,7 @@ class QuestionController(private val questionService: QuestionService) {
         val question = questionService.askQuestion(
             userSeq = request.userSeq,
             cardSeq = request.cardSeq,
+            solution = request.solution,
             category = request.category,
             targetPart = request.targetPart,
             content = request.content,
