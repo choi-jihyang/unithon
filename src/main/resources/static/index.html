@@ -14,13 +14,61 @@
 <div class="topbar">
   <div class="brand">떠난 사람은 없다</div>
   <div class="tabs">
-    <div class="tab active" data-s="2">이관</div>
+    <div class="tab active" data-s="1">연동수집</div>
+    <div class="tab" data-s="2">이관</div>
     <div class="tab" data-s="3">맥락카드</div>
+    <div class="tab" data-s="4">질문</div>
   </div>
 </div>
 
+<!-- F1: 연동수집 -->
+<section class="screen active" id="s1">
+  <div class="kicker">F1 · 활동 자동 수집</div>
+  <div class="hero-title">평소처럼 코드를 짜는 것만으로<br>기록이 쌓입니다</div>
+  <div class="hero-desc">구조화된 소스는 규칙 기반으로 자동 분류되고, Slack처럼 형식이 없는 소스는 분류에 실패하면 미분류 큐로 모입니다. 확신도가 낮은 항목은 사람이 최종 확정합니다.</div>
+
+  <div class="section" style="margin-bottom:34px;">
+    <div class="section-head" style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
+      <div class="section-title" style="font-size:13.5px; font-weight:700;">연동 설정</div>
+    </div>
+    <div class="card">
+      <div class="integ-row" style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--card-border);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--ink-soft);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-dim);font-family:'JetBrains Mono',monospace;">Git</div>
+          <div><div style="font-size:13px;font-weight:700;">GitHub</div><div style="font-size:10.5px;color:var(--text-faint);">커밋 · PR 설명 <span style="font-size:9.5px;color:var(--thread);background:rgba(79,175,158,.1);border-radius:10px;padding:2px 8px;margin-left:8px;">구조화</span></div></div>
+        </div>
+        <div class="toggle on" style="position:relative;width:38px;height:21px;border-radius:20px;background:rgba(79,175,158,.25);border:1px solid var(--thread);cursor:pointer;"></div>
+      </div>
+      <div class="integ-row" style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--card-border);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--ink-soft);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-dim);font-family:'JetBrains Mono',monospace;">Jr</div>
+          <div><div style="font-size:13px;font-weight:700;">Jira</div><div style="font-size:10.5px;color:var(--text-faint);">티켓 · 스프린트 코멘트 <span style="font-size:9.5px;color:var(--thread);background:rgba(79,175,158,.1);border-radius:10px;padding:2px 8px;margin-left:8px;">구조화</span></div></div>
+        </div>
+        <div class="toggle on" style="position:relative;width:38px;height:21px;border-radius:20px;background:rgba(79,175,158,.25);border:1px solid var(--thread);cursor:pointer;"></div>
+      </div>
+      <div class="integ-row" style="display:flex; align-items:center; justify-content:space-between; padding:12px 0;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--ink-soft);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-dim);font-family:'JetBrains Mono',monospace;">#</div>
+          <div><div style="font-size:13px;font-weight:700;">Slack</div><div style="font-size:10.5px;color:var(--text-faint);">채널 스레드 <span style="font-size:9.5px;color:var(--danger);background:rgba(201,117,111,.1);border-radius:10px;padding:2px 8px;margin-left:8px;">비구조화</span></div></div>
+        </div>
+        <div class="toggle on" style="position:relative;width:38px;height:21px;border-radius:20px;background:rgba(79,175,158,.25);border:1px solid var(--thread);cursor:pointer;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head" style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
+      <div class="section-title" style="font-size:13.5px; font-weight:700;">미분류 큐</div>
+      <div style="font-size:11px; color:var(--text-faint);">AI 제안 확신도가 낮으면 사람이 직접 분류합니다</div>
+    </div>
+    <div class="card" id="unclassified-root">
+      <div class="loading-state">불러오는 중…</div>
+    </div>
+  </div>
+</section>
+
 <!-- F2: 이관 -->
-<section class="screen active" id="s2">
+<section class="screen" id="s2">
   <div class="kicker">F2 · 이관 트리거 · 필수</div>
   <div class="hero-title">퇴사 처리에는<br>작성할 문서가 없습니다</div>
   <div class="hero-desc">담당자를 바꾸는 데 필요한 건 버튼 하나입니다.</div>
@@ -47,9 +95,50 @@
   </div>
 </section>
 
+<!-- F4: 질문 로깅 -->
+<section class="screen" id="s4">
+  <div class="kicker">F4 · 질문 로깅 · 선택</div>
+  <div class="hero-title">질문을 남기면<br>다음 사람의 답이 됩니다</div>
+  <div class="hero-desc">지금 남긴 질문은 카테고리별로 쌓여, 같은 맥락을 마주할 다음 담당자에게 그대로 전달됩니다.</div>
+
+  <div class="q4-context-banner" id="q4ContextBanner" style="display:none;"></div>
+
+  <div class="card q4-form">
+    <div class="q4-row">
+      <div class="q4-field">
+        <label class="q4-label">프로젝트 유형</label>
+        <select id="q4Category" class="q4-select"></select>
+      </div>
+      <div class="q4-field">
+        <label class="q4-label">노드 타입</label>
+        <select id="q4NodeType" class="q4-select">
+          <option value="decision">결정</option>
+          <option value="reason">이유</option>
+          <option value="evidence">근거</option>
+        </select>
+      </div>
+    </div>
+    <textarea id="q4Text" class="q4-textarea" rows="3" placeholder="궁금한 점을 남겨주세요…"></textarea>
+    <div class="q4-actions">
+      <button class="btn" id="q4SubmitBtn">남기기</button>
+      <span class="q4-status" id="q4Status"></span>
+    </div>
+  </div>
+
+  <div class="q4-history">
+    <div class="q4-filters" id="q4Filters"></div>
+    <div class="q4-list" id="q4List"></div>
+  </div>
+</section>
+
+<script src="/js/classifier.js"></script>
+<script src="/js/summarizer.js"></script>
+<script src="/js/prParser.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/handoff.js"></script>
 <script src="/js/context.js"></script>
+<script src="/js/question.js"></script>
+<script src="/js/intake.js"></script>
 <script>
   document.querySelectorAll('.tab').forEach(t => {
     t.addEventListener('click', () => {
@@ -57,6 +146,9 @@
       document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
       t.classList.add('active');
       document.getElementById('s' + t.dataset.s).classList.add('active');
+      if (t.dataset.s === '4' && typeof resetQuestionContextLink === 'function') {
+        resetQuestionContextLink();
+      }
     });
   });
 </script>
