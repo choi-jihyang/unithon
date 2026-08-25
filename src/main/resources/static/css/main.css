@@ -441,23 +441,6 @@
         .classify-btn:hover {
             background: #5c7cf6;
         }
-        .classify-ignore-btn {
-            background: transparent;
-            border: 1px solid var(--card-border);
-            color: var(--text-dim);
-            border-radius: 7px;
-            padding: 9px 16px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            flex-shrink: 0;
-            font-family: "Pretendard", sans-serif;
-        }
-        .classify-ignore-btn:hover {
-            background: var(--card-hi);
-            color: var(--text);
-        }
         .unclassified-grid {
             background: var(--card);
             border: 1px solid var(--card-border);

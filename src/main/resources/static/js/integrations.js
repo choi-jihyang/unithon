@@ -8,9 +8,12 @@
     if (unclassifiedMoreBtn) {
         unclassifiedMoreBtn.addEventListener("click", () => {
             const expanding = unclassifiedMoreBtn.textContent.trim() === "더보기";
+            // .hidden 카드만 찾으면 접을 때(이미 .hidden이 없는 상태) 아무 것도
+            // 안 걸려서 접기가 동작하지 않는다 — 5번째 카드부터는 항상 대상으로 삼는다.
             document
-                .querySelectorAll("#unclassifiedGrid .unclassified-card.hidden")
-                .forEach((card) => {
+                .querySelectorAll("#unclassifiedGrid .unclassified-card")
+                .forEach((card, idx) => {
+                    if (idx < 4) return;
                     card.classList.toggle("hidden", !expanding);
                 });
             unclassifiedMoreBtn.textContent = expanding ? "접기" : "더보기";
@@ -106,7 +109,6 @@
                 </div>
                 <div class="uq-actions-row">
                     <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
                         <button class="classify-btn">분류</button>
                     </div>
                 </div>`;
@@ -172,7 +174,7 @@
         openRegisterModal({ text, source, owner, sourceCard: card });
     }
 
-    // 카드 전체를 클릭해도 등록 화면이 열립니다. 단, 분류/무시 버튼 위 클릭은
+    // 카드 전체를 클릭해도 등록 화면이 열립니다. 단, 분류 버튼 위 클릭은
     // 각자의 동작을 우선하도록 제외합니다.
     function wireUnclassifiedCardHandlers() {
         document.querySelectorAll(".unclassified-card").forEach((card) => {
@@ -185,15 +187,6 @@
         document.querySelectorAll(".classify-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
                 openRegisterModalFromCard(btn.closest(".unclassified-card"));
-            });
-        });
-
-        // 무시: 삭제하지 않고 목록 맨 아래로 보냅니다. 여러 번 누르면 무시된
-        // 카드들이 그 순서대로 맨 밑에 쌓입니다.
-        document.querySelectorAll(".classify-ignore-btn").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                const card = btn.closest(".unclassified-card");
-                document.getElementById("unclassifiedGrid").appendChild(card);
             });
         });
     }
