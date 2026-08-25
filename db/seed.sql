@@ -172,28 +172,28 @@ INSERT INTO github_logs (
 ) VALUES
   (
     (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
-    'unithon', 'PR',
+    'groupware', 'PR',
     '외부로 메일 발송 시 대외비 파일 유출 이슈 발생',
     'DRM 도입하여 외부발송 건은 원본추출 절차를 추가해 관리할 필요가 있다고 판단',
     '김도현', '#142', '2025-03-05 10:00:00', NOW()
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'leeseojun'),
-    'unithon', 'PR',
+    'mes-platform', 'PR',
     'CI 단계를 5단계에서 3단계로 축소',
     '빌드 시간 단축이 목적이며, 테스트 커버리지는 별도 파이프라인으로 분리해 유지',
     '이서준', '#158', '2025-02-20 15:30:00', NOW()
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'leeseojun'),
-    'unithon', 'COMMIT',
+    'mes-platform', 'COMMIT',
     '의존성 설치 단계에 캐시 계층 추가',
     '동일 의존성을 매번 재설치하며 낭비되는 CI 시간을 줄이기 위함',
     '이서준', 'a1b2c3d', '2025-08-01 09:15:00', NOW()
   ),
   (
     (SELECT user_seq FROM users WHERE user_id = 'parkjimin'),
-    'unithon', 'PR',
+    'iso-audit', 'PR',
     '주요 시스템 접근 로그를 매일 자동 취합해 감사 리포트로 생성',
     'ISO 27001 심사 대비, 수기로 로그를 취합하던 절차에서 누락 사고가 발생함',
     '박지민', '#171', '2026-08-25 08:00:00', NOW()
