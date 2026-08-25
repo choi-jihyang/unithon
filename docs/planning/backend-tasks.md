@@ -32,15 +32,17 @@
 
 > 테스트 중 발견: `application.properties`의 `anthropic.api-key=${ANTHROPIC_API_KEY}`에 기본값이 없어서, 이 env var가 없으면 **F6과 무관하게 앱 전체가 부팅 실패**한다. 검증은 로컬 전용 더미 값으로 우회했음 — 실제 해결은 별도 논의 필요(사용자가 "아직"이라고 보류함).
 
-## Task 5. 프론트 fetch 연결
-- [ ] `js/context.js` — `caseData` 인라인 상수 대신 `GET /api/cards`/`GET /api/cards/{id}` fetch로 채움 (렌더 함수 재사용)
-- [ ] `js/handoff.js` — `owners`/`handoffCandidates` 대신 `GET /api/users` fetch, 이관 확정 시 `POST /api/ownership-transitions`
-- [ ] `js/questions.js` — 답변 등록 시 `POST /api/questions/{id}/answers` 호출
+## Task 5. 프론트 fetch 연결 — 프론트 담당자에게 전달 (내 작업 범위 아님)
+- [ ] `js/context.js` — `caseData` 인라인 상수 대신 `GET /api/cards?userSeq=`/`GET /api/cards/{id}?userSeq=` fetch로 채움 (렌더 함수 재사용)
+- [ ] `js/handoff.js` — `owners`/`handoffCandidates` 대신 `GET /api/users` fetch, 이관 확정 시 `POST /api/ownership-transitions`(`oldUserSeq`/`newUserSeq`/`transitionedByUserSeq`)
+- [ ] `js/questions.js`/`integrations.js` — 질문 등록 `POST /api/questions`, 답변 등록 `POST /api/questions/{id}/answers`
+- API 계약은 [`api-spec.md`](../api/api-spec.md) 참고. 백엔드(Task 1~4) 전부 완료·검증됨 — 언제든 붙여도 됨.
 
-## Task 6. 시간 남으면 (우선순위 낮음)
-- [ ] F1 `app_logs`/`github_logs`/`jira_logs`/`figma_logs` 실연동
-- [ ] `GET /api/questions`(질문 이력 목록 실데이터화)
-- [ ] F5 성과, F6 AI요약
+## Task 6. F1 실연동 — 다른 담당자 작업 중, 내 범위 아님
+- [ ] `app_logs`/`github_logs`/`jira_logs`/`figma_logs` 실연동 — 다른 분이 진행 중
+- [ ] `GET /api/questions`(질문 이력 목록 실데이터화) — 필요해지면 별도 논의
+
+## ~~F5 성과 / F6 AI요약~~ — 진행 안 함 (범위 제외)
 
 ## Task 7. 마감 전
 - [ ] 통합 테스트 (bootRun 후 실제 화면에서 F2/F3/F4 흐름 확인)
