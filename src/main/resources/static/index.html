@@ -1,839 +1,156 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Relay</title>
-    <!--
-      외부 CDN(웹폰트/아이콘) 의존성을 없애 오프라인·사내망 등 네트워크 제한
-      환경에서 열어도 항상 동일하게 렌더링되도록 시스템 폰트만 사용합니다.
-    -->
-    <link rel="stylesheet" href="/css/main.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>떠난 사람은 없다</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
+
 <div class="topbar">
-    <div class="brand">Relay</div>
-    <div class="tabs">
-        <div class="tab active" data-s="3">히스토리</div>
-        <div class="tab" data-s="4">질문</div>
-        <div class="tab" data-s="2">이관</div>
-        <div class="tab" data-s="1">연동설정</div>
-    </div>
-    <div class="topbar-right"></div>
+  <div class="brand">떠난 사람은 없다</div>
+  <div class="tabs">
+    <div class="tab active" data-s="1">연동수집</div>
+    <div class="tab" data-s="2">이관</div>
+    <div class="tab" data-s="3">맥락카드</div>
+    <div class="tab" data-s="4">질문</div>
+  </div>
 </div>
 
-<!-- ============ F1 ============ -->
-<section class="screen" id="s1">
-    <div class="hero-title">사용 중인 도구를 연결하세요</div>
-    <div class="hero-desc">
-        연결하면 커밋, 티켓, 코멘트가 자동으로 기록됩니다. Slack처럼 형식이
-        자유로운 곳은 확인이 필요할 수 있어요.
-    </div>
+<!-- F1: 연동수집 -->
+<section class="screen active" id="s1">
+  <div class="kicker">F1 · 활동 자동 수집</div>
+  <div class="hero-title">평소처럼 코드를 짜는 것만으로<br>기록이 쌓입니다</div>
+  <div class="hero-desc">구조화된 소스는 규칙 기반으로 자동 분류되고, Slack처럼 형식이 없는 소스는 분류에 실패하면 미분류 큐로 모입니다. 확신도가 낮은 항목은 사람이 최종 확정합니다.</div>
 
-    <div class="section">
-        <div class="section-head">
-            <div class="section-title">
-                연동 설정
-            </div>
-        </div>
-        <div class="card">
-            <div class="integ-row">
-                <div class="integ-left">
-                    <div class="integ-icon">GH</div>
-                    <div>
-                        <div class="integ-name">GitHub</div>
-                        <div class="integ-meta">
-                            커밋 · PR 설명 · 코드리뷰 코멘트<span
-                                class="integ-format structured"
-                        >구조화</span
-                        >
-                        </div>
-                    </div>
-                </div>
-                <div class="toggle on"></div>
-            </div>
-            <div class="integ-row">
-                <div class="integ-left">
-                    <div class="integ-icon">JR</div>
-                    <div>
-                        <div class="integ-name">Jira</div>
-                        <div class="integ-meta">
-                            티켓 · 스프린트 코멘트<span class="integ-format structured"
-                        >구조화</span
-                        >
-                        </div>
-                    </div>
-                </div>
-                <div class="toggle on"></div>
-            </div>
-            <div class="integ-row">
-                <div class="integ-left">
-                    <div class="integ-icon">FG</div>
-                    <div>
-                        <div class="integ-name">Figma</div>
-                        <div class="integ-meta">
-                            디자인 코멘트 · 버전 히스토리<span
-                                class="integ-format structured"
-                        >구조화</span
-                        >
-                        </div>
-                    </div>
-                </div>
-                <div class="toggle on"></div>
-            </div>
-            <div class="integ-row">
-                <div class="integ-left">
-                    <div class="integ-icon">SL</div>
-                    <div>
-                        <div class="integ-name">Slack</div>
-                        <div class="integ-meta">
-                            채널 스레드 · DM 제외<span class="integ-format unstructured"
-                        >비구조화</span
-                        >
-                        </div>
-                    </div>
-                </div>
-                <div class="toggle"></div>
-            </div>
-            <div class="integ-row">
-                <div class="integ-left">
-                    <div class="integ-icon">SN</div>
-                    <div>
-                        <div class="integ-name">Sentry</div>
-                        <div class="integ-meta">
-                            에러 로그 · 스택트레이스 · 심각도<span
-                                class="integ-format unstructured"
-                        >비구조화</span
-                        >
-                        </div>
-                    </div>
-                </div>
-                <div class="toggle"></div>
-            </div>
-            <div class="integ-row">
-                <div class="integ-left">
-                    <div class="integ-icon">LN</div>
-                    <div>
-                        <div class="integ-name">Linear</div>
-                        <div class="integ-meta">
-                            이슈 · 상태 변경 이력<span class="integ-format unstructured"
-                        >비구조화</span
-                        >
-                        </div>
-                    </div>
-                </div>
-                <div class="toggle"></div>
-            </div>
-        </div>
-        <div class="perm-note">
-            GitHub·Jira·Figma는 필드가 정형화돼 있어 자동 분류가 안정적입니다.
-            Slack·Sentry·Linear처럼 자유서술 소스는 켜둘 경우 미분류 큐가 늘어날
-            수 있습니다.
-        </div>
+  <div class="section" style="margin-bottom:34px;">
+    <div class="section-head" style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
+      <div class="section-title" style="font-size:13.5px; font-weight:700;">연동 설정</div>
     </div>
+    <div class="card">
+      <div class="integ-row" style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--card-border);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--ink-soft);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-dim);font-family:'JetBrains Mono',monospace;">Git</div>
+          <div><div style="font-size:13px;font-weight:700;">GitHub</div><div style="font-size:10.5px;color:var(--text-faint);">커밋 · PR 설명 <span style="font-size:9.5px;color:var(--thread);background:rgba(79,175,158,.1);border-radius:10px;padding:2px 8px;margin-left:8px;">구조화</span></div></div>
+        </div>
+        <div class="toggle on" style="position:relative;width:38px;height:21px;border-radius:20px;background:rgba(79,175,158,.25);border:1px solid var(--thread);cursor:pointer;"></div>
+      </div>
+      <div class="integ-row" style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--card-border);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--ink-soft);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-dim);font-family:'JetBrains Mono',monospace;">Jr</div>
+          <div><div style="font-size:13px;font-weight:700;">Jira</div><div style="font-size:10.5px;color:var(--text-faint);">티켓 · 스프린트 코멘트 <span style="font-size:9.5px;color:var(--thread);background:rgba(79,175,158,.1);border-radius:10px;padding:2px 8px;margin-left:8px;">구조화</span></div></div>
+        </div>
+        <div class="toggle on" style="position:relative;width:38px;height:21px;border-radius:20px;background:rgba(79,175,158,.25);border:1px solid var(--thread);cursor:pointer;"></div>
+      </div>
+      <div class="integ-row" style="display:flex; align-items:center; justify-content:space-between; padding:12px 0;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--ink-soft);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-dim);font-family:'JetBrains Mono',monospace;">#</div>
+          <div><div style="font-size:13px;font-weight:700;">Slack</div><div style="font-size:10.5px;color:var(--text-faint);">채널 스레드 <span style="font-size:9.5px;color:var(--danger);background:rgba(201,117,111,.1);border-radius:10px;padding:2px 8px;margin-left:8px;">비구조화</span></div></div>
+        </div>
+        <div class="toggle on" style="position:relative;width:38px;height:21px;border-radius:20px;background:rgba(79,175,158,.25);border:1px solid var(--thread);cursor:pointer;"></div>
+      </div>
+    </div>
+  </div>
 
-    <div class="section">
-        <div class="section-head">
-            <div class="section-title">
-                미분류 큐 <span class="section-badge warn">자동분류 실패</span>
-            </div>
-            <div class="section-note">
-                비구조화 소스에서 AI 분류가 확신하지 못한 항목
-            </div>
-        </div>
-        <div class="unclassified-grid" id="unclassifiedGrid">
-            <div class="unclassified-card">
-                <div class="uq-fields">
-                    <div class="uq-field">
-                        <div class="uq-label">앱</div>
-                        <div class="unclassified-source">
-                            <span class="unclassified-icon">SL</span>
-                            <span class="unclassified-source-name">Slack</span>
-                        </div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">담당자</div>
-                        <div class="uq-value">김도현</div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">일자</div>
-                        <div class="uq-value mono">2026.08.24</div>
-                    </div>
-                    <div class="uq-field uq-field-decision">
-                        <div class="uq-label">결정</div>
-                        <p class="unclassified-text">
-                            "이거 롤백해야 할 것 같은데 확인 부탁드려요"
-                        </p>
-                    </div>
-                </div>
-                <div class="uq-actions-row">
-                    <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
-                        <button class="classify-btn">분류</button>
-                    </div>
-                </div>
-            </div>
-            <div class="unclassified-card">
-                <div class="uq-fields">
-                    <div class="uq-field">
-                        <div class="uq-label">앱</div>
-                        <div class="unclassified-source">
-                            <span class="unclassified-icon">SL</span>
-                            <span class="unclassified-source-name">Slack</span>
-                        </div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">담당자</div>
-                        <div class="uq-value">박지민</div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">일자</div>
-                        <div class="uq-value mono">2026.08.23</div>
-                    </div>
-                    <div class="uq-field uq-field-decision">
-                        <div class="uq-label">결정</div>
-                        <p class="unclassified-text">"회의록 링크 여기 공유드립니다"</p>
-                    </div>
-                </div>
-                <div class="uq-actions-row">
-                    <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
-                        <button class="classify-btn">분류</button>
-                    </div>
-                </div>
-            </div>
-            <div class="unclassified-card">
-                <div class="uq-fields">
-                    <div class="uq-field">
-                        <div class="uq-label">앱</div>
-                        <div class="unclassified-source">
-                            <span class="unclassified-icon">SL</span>
-                            <span class="unclassified-source-name">Slack</span>
-                        </div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">담당자</div>
-                        <div class="uq-value">정하은</div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">일자</div>
-                        <div class="uq-value mono">2026.08.22</div>
-                    </div>
-                    <div class="uq-field uq-field-decision">
-                        <div class="uq-label">결정</div>
-                        <p class="unclassified-text">
-                            "점심 뭐 드실래요 근처에 새로 생긴 데 있던데"
-                        </p>
-                    </div>
-                </div>
-                <div class="uq-actions-row">
-                    <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
-                        <button class="classify-btn">분류</button>
-                    </div>
-                </div>
-            </div>
-            <div class="unclassified-card">
-                <div class="uq-fields">
-                    <div class="uq-field">
-                        <div class="uq-label">앱</div>
-                        <div class="unclassified-source">
-                            <span class="unclassified-icon">SL</span>
-                            <span class="unclassified-source-name">Slack</span>
-                        </div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">담당자</div>
-                        <div class="uq-value">정하은</div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">일자</div>
-                        <div class="uq-value mono">2026.08.21</div>
-                    </div>
-                    <div class="uq-field uq-field-decision">
-                        <div class="uq-label">결정</div>
-                        <p class="unclassified-text">"내일 3시에 배포 가능하신가요"</p>
-                    </div>
-                </div>
-                <div class="uq-actions-row">
-                    <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
-                        <button class="classify-btn">분류</button>
-                    </div>
-                </div>
-            </div>
-            <div class="unclassified-card hidden">
-                <div class="uq-fields">
-                    <div class="uq-field">
-                        <div class="uq-label">앱</div>
-                        <div class="unclassified-source">
-                            <span class="unclassified-icon">SL</span>
-                            <span class="unclassified-source-name">Slack</span>
-                        </div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">담당자</div>
-                        <div class="uq-value">김도현</div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">일자</div>
-                        <div class="uq-value mono">2026.08.20</div>
-                    </div>
-                    <div class="uq-field uq-field-decision">
-                        <div class="uq-label">결정</div>
-                        <p class="unclassified-text">
-                            "그거 OAuth 쪽으로 바꾸는 게 나을 것 같은데요"
-                        </p>
-                    </div>
-                </div>
-                <div class="uq-actions-row">
-                    <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
-                        <button class="classify-btn">분류</button>
-                    </div>
-                </div>
-            </div>
-            <div class="unclassified-card hidden">
-                <div class="uq-fields">
-                    <div class="uq-field">
-                        <div class="uq-label">앱</div>
-                        <div class="unclassified-source">
-                            <span class="unclassified-icon">SL</span>
-                            <span class="unclassified-source-name">Slack</span>
-                        </div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">담당자</div>
-                        <div class="uq-value">이서준</div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">일자</div>
-                        <div class="uq-value mono">2026.08.20</div>
-                    </div>
-                    <div class="uq-field uq-field-decision">
-                        <div class="uq-label">결정</div>
-                        <p class="unclassified-text">
-                            "캐시 TTL 값 늘린 이유가 트래픽 스파이크 때문이었어요"
-                        </p>
-                    </div>
-                </div>
-                <div class="uq-actions-row">
-                    <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
-                        <button class="classify-btn">분류</button>
-                    </div>
-                </div>
-            </div>
-            <div class="unclassified-card hidden">
-                <div class="uq-fields">
-                    <div class="uq-field">
-                        <div class="uq-label">앱</div>
-                        <div class="unclassified-source">
-                            <span class="unclassified-icon">SL</span>
-                            <span class="unclassified-source-name">Slack</span>
-                        </div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">담당자</div>
-                        <div class="uq-value">이서준</div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">일자</div>
-                        <div class="uq-value mono">2026.08.19</div>
-                    </div>
-                    <div class="uq-field uq-field-decision">
-                        <div class="uq-label">결정</div>
-                        <p class="unclassified-text">
-                            "첨부한 아키텍처 문서 참고 부탁드립니다"
-                        </p>
-                    </div>
-                </div>
-                <div class="uq-actions-row">
-                    <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
-                        <button class="classify-btn">분류</button>
-                    </div>
-                </div>
-            </div>
-            <div class="unclassified-card hidden">
-                <div class="uq-fields">
-                    <div class="uq-field">
-                        <div class="uq-label">앱</div>
-                        <div class="unclassified-source">
-                            <span class="unclassified-icon">SL</span>
-                            <span class="unclassified-source-name">Slack</span>
-                        </div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">담당자</div>
-                        <div class="uq-value">박지민</div>
-                    </div>
-                    <div class="uq-field">
-                        <div class="uq-label">일자</div>
-                        <div class="uq-value mono">2026.08.18</div>
-                    </div>
-                    <div class="uq-field uq-field-decision">
-                        <div class="uq-label">결정</div>
-                        <p class="unclassified-text">
-                            "일단 지금 방식대로 가고 나중에 리팩터링하시죠"
-                        </p>
-                    </div>
-                </div>
-                <div class="uq-actions-row">
-                    <div class="classify-inline">
-                        <button class="classify-ignore-btn">무시</button>
-                        <button class="classify-btn">분류</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <button class="btn ghost" id="unclassifiedMoreBtn">더보기</button>
+  <div class="section">
+    <div class="section-head" style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
+      <div class="section-title" style="font-size:13.5px; font-weight:700;">미분류 큐</div>
+      <div style="font-size:11px; color:var(--text-faint);">AI 제안 확신도가 낮으면 사람이 직접 분류합니다</div>
     </div>
-
-    <div class="case-modal-overlay" id="registerModalOverlay">
-        <div class="case-modal">
-            <button
-                    class="case-modal-close"
-                    id="registerModalClose"
-                    aria-label="닫기"
-            >
-                ×
-            </button>
-            <div class="section-title" style="margin-bottom: 4px">
-                카드로 등록
-            </div>
-            <div class="section-note" style="margin-bottom: 18px">
-                미분류 메시지를 담당·결정·이유·근거 카드로 등록합니다. 확인되지
-                않은 항목은 비워두고 나중에 채울 수 있습니다.
-            </div>
-            <div class="register-field">
-                <label class="form-label">솔루션명</label>
-                <input
-                        class="form-input"
-                        id="registerProjectInput"
-                        placeholder="이 카드가 속한 솔루션명을 입력하세요"
-                />
-            </div>
-            <div class="register-field">
-                <label class="form-label">카드 제목</label>
-                <input
-                        class="form-input"
-                        id="registerTitleInput"
-                        placeholder="예: OAuth 전환 검토"
-                />
-            </div>
-            <div class="register-field">
-                <label class="form-label">담당 (누가)</label>
-                <input
-                        class="form-input"
-                        id="registerOwnerInput"
-                        placeholder="담당자를 입력하세요"
-                />
-            </div>
-            <div class="register-field">
-                <label class="form-label">결정 (무엇을)</label>
-                <textarea
-                        class="form-input"
-                        id="registerDecisionInput"
-                        rows="2"
-                        placeholder="결정 내용을 입력하세요"
-                ></textarea>
-            </div>
-            <div class="register-field">
-                <label class="form-label">이유 (왜냐하면)</label>
-                <textarea
-                        class="form-input"
-                        id="registerReasonInput"
-                        rows="2"
-                        placeholder="결정 이유를 입력하세요"
-                ></textarea>
-            </div>
-            <div class="register-field">
-                <label class="form-label">근거 (참고했다) · <span id="registerSourceTag">Slack</span></label>
-                <textarea
-                        class="form-input"
-                        id="registerEvidenceInput"
-                        rows="2"
-                        placeholder="근거 자료를 입력하세요"
-                ></textarea>
-            </div>
-            <div class="register-actions">
-                <button class="btn ghost" id="registerCancelBtn">취소</button>
-                <button class="btn sm" id="registerSaveBtn">카드로 등록</button>
-            </div>
-        </div>
+    <div class="card" id="unclassified-root">
+      <div class="loading-state">불러오는 중…</div>
     </div>
+  </div>
 </section>
 
-<!-- ============ F2 (필수) ============ -->
+<!-- F2: 이관 -->
 <section class="screen" id="s2">
-    <div class="hero-title">담당자를 변경하세요</div>
-    <div class="hero-desc">
-        인수인계 문서를 작성할 필요 없이, 담당 프로젝트와 축적된 기록이 그대로
-        다음 담당자에게 넘어갑니다.
-    </div>
+  <div class="kicker">F2 · 이관 트리거 · 필수</div>
+  <div class="hero-title">퇴사 처리에는<br>작성할 문서가 없습니다</div>
+  <div class="hero-desc">담당자를 바꾸는 데 필요한 건 버튼 하나입니다.</div>
+  <div class="role-badge admin">● 관리자 권한으로 접속 중 · 이관 가능</div>
 
-    <div class="section owner-list-section">
-        <div class="section-head">
-            <div class="section-title">
-                이관 대상 목록
-                <span class="role-badge admin">관리자 권한</span>
-            </div>
-        </div>
-        <div class="card owner-list-card" id="ownerList">
-            <div class="owner-row selected" data-owner="kim">
-                <div class="owner-left">
-                    <div class="avatar owner-avatar">김</div>
-                    <div>
-                        <b>김도현 백엔드 개발자</b>
-                        <div class="owner-sub">담당 프로젝트 3건</div>
-                    </div>
-                </div>
-                <div class="owner-right">
-                    <span class="status-chip chip-leaving">퇴사예정</span>
-                </div>
-            </div>
-            <div class="owner-row not-selectable" data-owner="jung">
-                <div class="owner-left">
-                    <div class="avatar owner-avatar">정</div>
-                    <div>
-                        <b>정하은 백엔드 개발자</b>
-                        <div class="owner-sub">담당 프로젝트 5건</div>
-                    </div>
-                </div>
-                <div class="owner-right">
-                    <span class="status-chip chip-active">재직중</span>
-                </div>
-            </div>
-        </div>
-        <div class="perm-note">
-            일반 구성원 계정으로 접속 시 행 선택이 비활성화됩니다 — 이관은
-            팀장/관리자 권한만 실행 가능
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-head">
-            <div class="section-title">
-                이관 실행
-            </div>
-        </div>
-        <div class="handoff-layout">
-            <div class="handoff-main">
-                <div class="handoff-placeholder" id="handoffPlaceholder">
-                    이관 대상 목록에서 담당자를 선택하면<br />
-                    이관받을 담당자를 고르는 창이 열립니다.
-                </div>
-                <div id="handoffFilled" style="display: none">
-                    <div>
-                        <div class="avatar-row">
-                            <div class="avatar" id="handoffAvatar">김</div>
-                            <div>
-                                <div class="handoff-name" id="handoffName">
-                                    김도현 백엔드 개발자
-                                </div>
-                                <div class="handoff-status" id="handoffStatus">
-                                    4년차 · 퇴사예정
-                                </div>
-                            </div>
-                        </div>
-                        <div class="handoff-cases" id="handoffCases">
-                            담당 프로젝트 <b>3건</b>이 <b>정하은 개발자</b>에게
-                            이관됩니다.<br />축적된 결정·근거 그래프는 그대로 유지되며,
-                            담당자 정보만 갱신됩니다.
-                        </div>
-                    </div>
-                    <div>
-                        <button class="handoff-btn" id="handoffConfirmBtn">
-                            담당자 이관하기
-                        </button>
-                        <div class="handoff-empty-note">
-                            💡 별도의 인수인계 문서 작성 없이 즉시 반영됩니다
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="section-title" style="margin-bottom: 10px">
-                    이관 대상 프로젝트
-                </div>
-                <div class="handoff-project-total" id="handoffProjectTotal">
-                    담당자를 선택하면 표시됩니다
-                </div>
-                <div id="handoffProjectBreakdown"></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="case-modal-overlay" id="handoffPickerOverlay">
-        <div class="case-modal" style="max-width: 480px">
-            <button
-                    class="case-modal-close"
-                    id="handoffPickerClose"
-                    aria-label="닫기"
-            >
-                ×
-            </button>
-            <div class="section-title" style="margin-bottom: 4px">
-                담당자 선택
-            </div>
-            <div class="section-note" style="margin-bottom: 16px" id="handoffPickerNote">
-                이관받을 담당자를 선택하세요.
-            </div>
-            <div class="card" id="handoffCandidateList"></div>
-        </div>
-    </div>
+  <div class="handoff-main" id="handoffMain">
+    <div class="check-icon">✓</div>
+    <div style="font-size:15px; font-weight:700; margin-bottom:6px;">김도현 개발자 → 정하은 개발자</div>
+    <div style="font-size:12px; color:var(--text-dim); margin-bottom:22px;">담당 프로젝트 3건이 이관됩니다. 축적된 결정·근거 그래프는 그대로 유지됩니다.</div>
+    <button class="handoff-btn" id="handoffBtn">담당자 이관하기</button>
+    <div id="handoffStatus" style="font-size:12px; color:var(--thread); margin-top:10px;"></div>
+    <div class="handoff-empty-note">입력 항목 없음 · 첨부파일 없음 · 사유 작성 불필요 · role: admin required</div>
+  </div>
 </section>
 
-<!-- ============ F3 (핵심/필수) ============ -->
-<section class="screen active" id="s3">
-    <div class="hero-title">담당자와 결정 이력을 확인하세요</div>
-    <div class="hero-desc">
-        프로젝트에 들어오면 담당자, 결정 사항과 그 이유, 근거 자료가 순서대로
-        표시됩니다.
-    </div>
+<!-- F3: 맥락카드 -->
+<section class="screen" id="s3">
+  <div class="kicker">F3 · 컨텍스트 카드 · 필수</div>
+  <div class="hero-title">질문하기 전에,<br>답이 먼저 도착합니다</div>
+  <div class="hero-desc">프로젝트 화면에 들어오는 순간, 담당·결정·이유·근거가 순서대로 이어집니다.</div>
 
-    <div class="section">
-        <div class="section-head">
-            <div class="section-title">
-                카드 이력
-            </div>
-            <div class="section-note">
-                AI가 자동 분류한 프로젝트 히스토리입니다
-            </div>
-        </div>
-        <div class="cat-filter-bar">
-            <div class="cat-chip active">전체 <span class="count">4</span></div>
-            <div class="cat-chip">인증/로그인 <span class="count">1</span></div>
-            <div class="cat-chip">결제/정산 <span class="count">1</span></div>
-            <div class="cat-chip">인프라/배포 <span class="count">2</span></div>
-        </div>
-        <div class="card" id="caseHistoryList">
-            <!-- 카드 행은 JS에서 caseData 기준으로 렌더링됩니다 -->
-        </div>
-    </div>
-
-    <div class="case-modal-overlay" id="caseModalOverlay">
-        <div class="case-modal">
-            <button class="case-modal-close" id="caseModalClose" aria-label="닫기">
-                ×
-            </button>
-            <div class="case-strip">
-                <div>
-                    <div class="case-code mono" id="caseCode">PJ-014</div>
-                    <div class="case-title" id="caseTitle">인증 시스템</div>
-                </div>
-                <div class="case-tags">
-                    <div class="case-tag" id="caseTag1">백엔드</div>
-                    <div class="case-tag" id="caseTag2">착수 2025.03.05</div>
-                </div>
-            </div>
-
-            <div class="context-layout">
-                <div class="context-card">
-                    <div class="context-card-head">
-                        <div class="owner-line">
-                            솔루션명 <span class="owner-name" id="caseProjectName">인증 시스템</span>
-                        </div>
-                    </div>
-                    <div class="chain" id="caseChain">
-                        <div class="thread-line"></div>
-                        <!-- 담당/결정/이유/근거 노드는 JS에서 렌더링됩니다 -->
-                    </div>
-                </div>
-                <div class="context-side">
-                    <div class="side-mini">
-                        <div class="side-mini-label">이 카드를 본 후</div>
-                        <div class="side-mini-val" style="color: var(--mint)" id="caseAfterView">
-                            후속 문의 1건
-                        </div>
-                    </div>
-                    <button
-                            class="link-question-btn"
-                            id="caseLinkBtn"
-                            onclick="linkToQuestion('인증 시스템', '인증/로그인')"
-                    >
-                        이 맥락으로 질문하기 →
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+  <div id="context-root">
+    <div class="loading-state">맥락을 불러오는 중…</div>
+  </div>
 </section>
 
-<!-- ============ F4 ============ -->
+<!-- F4: 질문 로깅 -->
 <section class="screen" id="s4">
-    <div class="hero-title">궁금한 점을 남겨주세요</div>
-    <div class="hero-desc">
-        프로젝트 유형별로 분류돼 이력으로 남고, 다음에 같은 질문이 반복되지
-        않도록 그래프에 반영됩니다.
+  <div class="kicker">F4 · 질문 로깅 · 선택</div>
+  <div class="hero-title">질문을 남기면<br>다음 사람의 답이 됩니다</div>
+  <div class="hero-desc">지금 남긴 질문은 카테고리별로 쌓여, 같은 맥락을 마주할 다음 담당자에게 그대로 전달됩니다.</div>
+
+  <div class="q4-context-banner" id="q4ContextBanner" style="display:none;"></div>
+
+  <div class="card q4-form">
+    <div class="q4-row">
+      <div class="q4-field">
+        <label class="q4-label">프로젝트 유형</label>
+        <select id="q4Category" class="q4-select"></select>
+      </div>
+      <div class="q4-field">
+        <label class="q4-label">노드 타입</label>
+        <select id="q4NodeType" class="q4-select">
+          <option value="decision">결정</option>
+          <option value="reason">이유</option>
+          <option value="evidence">근거</option>
+        </select>
+      </div>
     </div>
-
-    <div class="linked-banner" id="linkedBanner">
-        <span
-        >맥락카드 <b id="linkedTitle"></b>에서 이어짐 — 카테고리는 AI가 이미
-          분류했습니다</span
-        >
-        <span class="linked-cat-tag" id="linkedCat"></span>
+    <textarea id="q4Text" class="q4-textarea" rows="3" placeholder="궁금한 점을 남겨주세요…"></textarea>
+    <div class="q4-actions">
+      <button class="btn" id="q4SubmitBtn">남기기</button>
+      <span class="q4-status" id="q4Status"></span>
     </div>
+  </div>
 
-    <div class="section">
-        <div class="section-head">
-            <div class="section-title">질문하기</div>
-        </div>
-        <div class="card">
-            <div class="cat-row">
-                <div class="form-field">
-                    <label class="form-label">솔루션명</label>
-                    <select class="select-input" id="projectSelect">
-                        <option>그룹웨어</option>
-                        <option>ERP</option>
-                        <option>MES</option>
-                        <option>ISO</option>
-                        <option>채용 시스템</option>
-                        <option>근태관리 시스템</option>
-                        <option>+ 새 솔루션 추가</option>
-                    </select>
-                </div>
-                <div class="form-field">
-                    <label class="form-label">유형</label>
-                    <select class="select-input" id="projectTypeSelect">
-                        <option>인증/로그인</option>
-                        <option>결제/정산</option>
-                        <option>데이터 파이프라인</option>
-                        <option>인프라/배포</option>
-                        <option>API 연동</option>
-                        <option>프론트엔드 UI</option>
-                        <option>성능 최적화</option>
-                        <option>+ 새 유형 추가</option>
-                    </select>
-                </div>
-                <div class="form-field">
-                    <label class="form-label">어떤 부분에 대한 질문인가요</label>
-                    <select class="select-input">
-                        <option>결정 내용</option>
-                        <option>결정 이유</option>
-                        <option>근거 자료</option>
-                    </select>
-                </div>
-            </div>
-            <div class="q-input-row">
-                <input
-                        class="form-input"
-                        placeholder="궁금한 점을 남겨주세요"
-                /><button class="btn sm">질문 등록</button>
-            </div>
-            <div class="add-cat-link">+ 목록에 없는 유형이라면 직접 추가</div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-head">
-            <div class="section-title">
-                질문 이력
-            </div>
-        </div>
-
-        <div class="cat-filter-bar">
-            <div class="cat-chip active">전체 <span class="count">6</span></div>
-            <div class="cat-chip">인증/로그인 <span class="count">2</span></div>
-            <div class="cat-chip">결제/정산 <span class="count">2</span></div>
-            <div class="cat-chip">인프라/배포 <span class="count">1</span></div>
-            <div class="cat-chip">
-                데이터 파이프라인 <span class="count">1</span>
-            </div>
-        </div>
-
-        <div class="cat-group">
-            <div class="cat-group-head">
-                <div class="cat-group-title">인증/로그인</div>
-                <div class="cat-group-count">2건</div>
-            </div>
-            <div class="cat-group-items">
-                <div class="q-list-item">
-                    인증 시스템 — "OAuth2로 전환하면서 기존 세션 기반 API 클라이언트도
-                    같이 마이그레이션해야 하나요?"<span class="node-type-tag decision"
-                >결정</span
-                >
-                    <div class="q-meta">정하은 · 2026.08.25 09:31</div>
-                </div>
-                <div class="q-list-item">
-                    로그인 리다이렉트 — "왜 콜백 URL을 화이트리스트 방식으로
-                    바꿨나요?"<span class="node-type-tag decision">결정</span>
-                    <div class="q-meta">정하은 · 2026.08.25 10:02</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="cat-group">
-            <div class="cat-group-head">
-                <div class="cat-group-title">결제/정산</div>
-                <div class="cat-group-count">2건</div>
-            </div>
-            <div class="cat-group-items">
-                <div class="q-list-item">
-                    정기결제 로직 — "재시도 정책이 3회로 정해진 근거가 있나요?"<span
-                        class="node-type-tag evidence"
-                >근거</span
-                >
-                    <div class="q-meta">정하은 · 2026.08.25 11:14</div>
-                </div>
-                <div class="q-list-item">
-                    환불 처리 — "환불 승인 단계를 없앤 이유가 뭔가요?"<span
-                        class="node-type-tag reason"
-                >이유</span
-                >
-                    <div class="q-meta">정하은 · 2026.08.26 09:02</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="cat-group">
-            <div class="cat-group-head">
-                <div class="cat-group-title">인프라/배포</div>
-                <div class="cat-group-count">1건</div>
-            </div>
-            <div class="cat-group-items">
-                <div class="q-list-item">
-                    배포 파이프라인 — "CI 단계를 줄인 게 속도 때문인가요, 비용
-                    때문인가요?"<span class="node-type-tag reason">이유</span>
-                    <div class="q-meta">정하은 · 2026.08.26 14:20</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="case-modal-overlay" id="qaModalOverlay">
-        <div class="case-modal" style="max-width: 620px">
-            <button class="case-modal-close" id="qaModalClose" aria-label="닫기">
-                ×
-            </button>
-            <div class="qa-modal-head">
-                <div class="qa-modal-title" id="qaModalTitle">인증 시스템</div>
-                <span class="node-type-tag decision" id="qaModalTag">결정</span>
-            </div>
-            <div class="qa-modal-question" id="qaModalQuestion">
-                "질문 내용"
-            </div>
-            <div class="qa-modal-meta" id="qaModalMeta">정하은 · 2026.08.25 09:31</div>
-
-            <div class="qa-thread" id="qaThread"></div>
-
-            <div class="q-input-row">
-                <input
-                        class="form-input"
-                        id="qaAnswerInput"
-                        placeholder="답변을 입력하세요"
-                /><button class="btn sm" id="qaAnswerBtn">답변 등록</button>
-            </div>
-        </div>
-    </div>
+  <div class="q4-history">
+    <div class="q4-filters" id="q4Filters"></div>
+    <div class="q4-list" id="q4List"></div>
+  </div>
 </section>
 
-<script src="/js/common.js"></script>
+<script src="/js/classifier.js"></script>
+<script src="/js/summarizer.js"></script>
+<script src="/js/prParser.js"></script>
+<script src="/js/api.js"></script>
 <script src="/js/handoff.js"></script>
 <script src="/js/context.js"></script>
-<script src="/js/integrations.js"></script>
-<script src="/js/questions.js"></script>
+<script src="/js/question.js"></script>
+<script src="/js/intake.js"></script>
+<script>
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('s' + t.dataset.s).classList.add('active');
+      if (t.dataset.s === '4' && typeof resetQuestionContextLink === 'function') {
+        resetQuestionContextLink();
+      }
+    });
+  });
+</script>
 </body>
 </html>
