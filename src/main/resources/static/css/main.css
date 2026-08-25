@@ -1552,3 +1552,10 @@
             background: rgba(201, 154, 82, 0.12);
             border: 1px solid rgba(201, 154, 82, 0.35);
         }
+
+        /* ===== F3/F4: API 실패 시 안내 ===== */
+        .api-error-note {
+            font-size: 13.5px;
+            color: var(--danger);
+            padding: 14px 0;
+        }
