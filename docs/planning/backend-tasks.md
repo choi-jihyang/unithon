@@ -30,17 +30,31 @@
 - [x] `QuestionController.kt` — `POST /api/questions`, `POST /api/questions/{questionSeq}/answers`
 - [x] `CardService` 상세 조회에 `afterViewCount`(=`questions.card_seq` count) 실제 연결, curl로 질문→답변→카운트 반영까지 확인
 
-> 테스트 중 발견: `application.properties`의 `anthropic.api-key=${ANTHROPIC_API_KEY}`에 기본값이 없어서, 이 env var가 없으면 **F6과 무관하게 앱 전체가 부팅 실패**한다. 검증은 로컬 전용 더미 값으로 우회했음 — 실제 해결은 별도 논의 필요(사용자가 "아직"이라고 보류함).
+> 테스트 중 발견: `application.properties`의 `anthropic.api-key=${ANTHROPIC_API_KEY}`에 기본값이 없어서, 이 env var가 없으면 **F6과 무관하게 앱 전체가 부팅 실패**한다. → PR #9에서 빈 값으로 고정해서 해결.
+
+## Task 4-1. 이관 권한 분리 제거 — ✅ 완료 (PR #10)
+- [x] `OwnershipTransitionService.transfer()`의 `position_seq>=5` 체크 제거 — 고도화 단계로 미룸
+
+## Task 4-2. `POST /api/cards` — ✅ 완료 (PR #11)
+- [x] F1 "카드로 등록"의 유일한 저장 경로. `userSeq`만 필수, 나머지 nullable
+- [x] curl로 생성→목록 반영 확인 완료
+
+## Task 4-3. 질문 이력 조회 API — ✅ 완료
+- [x] `GET /api/questions?cardSeq=` — 질문 목록(카드 필터 선택), userName/cardTitle 조인
+- [x] `GET /api/questions/{questionSeq}/answers` — 답변 스레드 조회(등록순)
+- [x] curl로 질문 등록→답변 등록→목록/스레드 조회까지 확인
+
+**로그인/세션**: `userSeq`는 "유저 목록 중 한 명을 로그인한 것으로 가정"하고 프론트가 고정값/선택 UI로 처리하기로 함 (백엔드 작업 아님)
 
 ## Task 5. 프론트 fetch 연결 — 프론트 담당자에게 전달 (내 작업 범위 아님)
 - [ ] `js/context.js` — `caseData` 인라인 상수 대신 `GET /api/cards?userSeq=`/`GET /api/cards/{id}?userSeq=` fetch로 채움 (렌더 함수 재사용)
-- [ ] `js/handoff.js` — `owners`/`handoffCandidates` 대신 `GET /api/users` fetch, 이관 확정 시 `POST /api/ownership-transitions`(`oldUserSeq`/`newUserSeq`/`transitionedByUserSeq`)
-- [ ] `js/questions.js`/`integrations.js` — 질문 등록 `POST /api/questions`, 답변 등록 `POST /api/questions/{id}/answers`
-- API 계약은 [`api-spec.md`](../api/api-spec.md) 참고. 백엔드(Task 1~4) 전부 완료·검증됨 — 언제든 붙여도 됨.
+- [ ] `js/handoff.js` — `owners`/`handoffCandidates` 대신 `GET /api/users` fetch, 이관 확정 시 `POST /api/ownership-transitions`(`oldUserSeq`/`newUserSeq`/`transitionedByUserSeq`, 권한 체크 없음)
+- [ ] `js/integrations.js` — 카드 등록 `POST /api/cards` (담당자 입력을 자유 텍스트 → `GET /api/users` 선택으로 변경 필요)
+- [ ] `js/questions.js` — 질문 등록 `POST /api/questions`, 답변 등록 `POST /api/questions/{id}/answers`, 목록/스레드는 `GET /api/questions`, `GET /api/questions/{id}/answers`
+- API 계약은 [`api-spec.md`](../api/api-spec.md) 참고. 백엔드 전부 완료·검증됨 — 언제든 붙여도 됨.
 
 ## Task 6. F1 실연동 — 다른 담당자 작업 중, 내 범위 아님
 - [ ] `app_logs`/`github_logs`/`jira_logs`/`figma_logs` 실연동 — 다른 분이 진행 중
-- [ ] `GET /api/questions`(질문 이력 목록 실데이터화) — 필요해지면 별도 논의
 
 ## ~~F5 성과 / F6 AI요약~~ — 진행 안 함 (범위 제외)
 

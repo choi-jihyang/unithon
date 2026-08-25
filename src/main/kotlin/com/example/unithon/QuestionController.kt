@@ -1,8 +1,10 @@
 package com.example.unithon
 
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDateTime
 
@@ -43,4 +45,12 @@ class QuestionController(private val questionService: QuestionService) {
         val answer = questionService.answerQuestion(questionSeq, request.userSeq, request.content)
         return AnswerResponse(answerSeq = requireNotNull(answer.seq), createdAt = answer.createdAt)
     }
+
+    @GetMapping("/api/questions")
+    fun getQuestions(@RequestParam(required = false) cardSeq: Long?): List<QuestionListItem> =
+        questionService.listQuestions(cardSeq)
+
+    @GetMapping("/api/questions/{questionSeq}/answers")
+    fun getAnswers(@PathVariable questionSeq: Long): List<AnswerListItem> =
+        questionService.listAnswers(questionSeq)
 }
