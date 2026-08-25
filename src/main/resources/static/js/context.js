@@ -1,100 +1,266 @@
 /**
- * context.js — F3 컨텍스트 카드 렌더링
- * API.getContext(projectCode)로 데이터를 받아 카드를 그린다.
+ * context.js — F3 맥락카드 (카드 하나 = 담당·결정·이유·근거 4개 노드로 구성된 관계 체인)
  */
+    // 카드 하나 = 담당(누가) · 결정(decision.name) · 이유(document.name) ·
+    // 근거(ticket.name, 클릭 가능) 4개 노드로 구성된 관계 체인
+    const caseData = {
+        "PJ-014": {
+            title: "인증 시스템",
+            project: "그룹웨어",
+            app: "GitHub",
+            tags: ["백엔드", "착수 2025.03.05"],
+            category: "인증/로그인",
+            hop: "3-HOP TRACED",
+            afterView: "후속 문의 1건",
+            related: [
+                { name: "결제 모듈", date: "2025.06.14 · 정기결제 로직 변경" },
+                { name: "배포 파이프라인", date: "2025.07.04 · CI 단계 축소" },
+            ],
+            chain: [
+                { tag: "담당", name: "김도현", date: "2025.05.07" },
+                {
+                    tag: "결정",
+                    name: "자체 세션 방식에서 OAuth2 기반 인증으로 전환",
+                    date: "2025.05.07",
+                },
+                {
+                    tag: "이유",
+                    name: "자체 세션 관리 방식에서 토큰 재사용 취약점이 지적되어, 검증된 표준 프로토콜로 이전할 필요가 있다고 판단",
+                    date: "2025.05.07 · 결정과 동일 시점",
+                },
+                {
+                    tag: "근거",
+                    name: "보안감사 리포트 #INFRA-241",
+                    date: "2025.04.22",
+                    tooltip:
+                        "외부 보안 감사 결과, 기존 세션 토큰이 만료 처리 없이 재사용 가능한 구조로 확인됨. 심각도 High로 분류되어 즉시 조치 필요...",
+                },
+            ],
+        },
+        "PJ-021": {
+            title: "결제 모듈",
+            project: "ERP",
+            app: "Jira",
+            tags: ["백엔드", "착수 2025.04.10"],
+            category: "결제/정산",
+            hop: "2-HOP TRACED",
+            afterView: "후속 문의 2건",
+            related: [
+                { name: "인증 시스템", date: "2025.05.07 · OAuth2 기반 인증 전환" },
+            ],
+            chain: [
+                { tag: "담당", name: "정하은", date: "2025.06.14" },
+                {
+                    tag: "결정",
+                    name: "정기결제 재시도 로직을 최대 3회로 제한",
+                    date: "2025.06.14",
+                },
+                {
+                    tag: "이유",
+                    name: "PG사 정책상 과도한 재시도는 카드사 차단으로 이어질 수 있어 3회로 제한",
+                    date: "2025.06.14 · 결정과 동일 시점",
+                },
+                {
+                    tag: "근거",
+                    name: "결제 정책 문서 #PAY-088",
+                    date: "2025.06.10",
+                    tooltip:
+                        "PG사 연동 가이드에서 결제 재시도가 3회를 초과할 경우 이상거래로 분류되어 일시 차단될 수 있다고 명시.",
+                },
+            ],
+        },
+        "PJ-033": {
+            title: "배포 파이프라인",
+            project: "MES",
+            app: "GitHub",
+            tags: ["인프라", "착수 2025.02.20"],
+            category: "인프라/배포",
+            hop: "2-HOP TRACED",
+            afterView: "후속 문의 1건",
+            related: [
+                { name: "CI 캐시 최적화", date: "2025.08.24 · 캐시 계층 추가" },
+            ],
+            chain: [
+                { tag: "담당", name: "이서준", date: "2025.07.04" },
+                {
+                    tag: "결정",
+                    name: "CI 단계를 5단계에서 3단계로 축소",
+                    date: "2025.07.04",
+                },
+                {
+                    tag: "이유",
+                    name: "빌드 시간 단축이 목적이며, 테스트 커버리지는 별도 파이프라인으로 분리해 유지",
+                    date: "2025.07.04 · 결정과 동일 시점",
+                },
+                {
+                    tag: "근거",
+                    name: "인프라 리포트 #INFRA-260",
+                    date: "2025.06.28",
+                    tooltip:
+                        "최근 1개월간 CI 파이프라인 실행 시간을 집계한 결과 평균 22분으로, 배포 지연의 주요 원인으로 지목됨.",
+                },
+            ],
+        },
+        "PJ-040": {
+            title: "CI 캐시 최적화",
+            project: "MES",
+            app: "GitHub",
+            tags: ["인프라", "착수 2025.08.01"],
+            category: "인프라/배포",
+            hop: "1-HOP TRACED",
+            afterView: "후속 문의 없음",
+            related: [
+                { name: "배포 파이프라인", date: "2025.07.04 · CI 단계 축소" },
+            ],
+            chain: [
+                { tag: "담당", name: "이서준", date: "2025.08.24" },
+                {
+                    tag: "결정",
+                    name: "의존성 설치 단계에 캐시 계층 추가",
+                    date: "2025.08.24",
+                },
+                {
+                    tag: "이유",
+                    name: "동일 의존성을 매번 재설치하며 낭비되는 CI 시간을 줄이기 위함",
+                    date: "2025.08.24 · 결정과 동일 시점",
+                },
+                {
+                    tag: "근거",
+                    name: "벤치마크 리포트 #INFRA-268",
+                    date: "2025.08.20",
+                },
+            ],
+        },
+    };
 
-function nodeTypeLabel(type) {
-  return { decision: '결정', reason: '왜냐하면', evidence: '근거' }[type] || type;
-}
+    function renderChainNode(n) {
+        const hasName = !!(n.name && n.name.trim());
+        const isEvidence = n.tag === "근거" && hasName;
+        const dotClass = isEvidence ? "node-dot evidence-dot" : "node-dot";
+        const tagClass = isEvidence ? "node-tag evidence-tag" : "node-tag";
+        const textClass = isEvidence
+            ? "node-text node-text-link"
+            : "node-text";
+        const tooltip =
+            isEvidence && n.tooltip
+                ? `<div class="tooltip">${n.tooltip}</div>`
+                : "";
+        const nameContent = !hasName
+            ? '<span class="node-empty">아직 입력되지 않음</span>'
+            : isEvidence
+              ? `${n.name} →${tooltip}`
+              : n.name;
+        return `<div class="node">
+                    <div class="${dotClass}"></div>
+                    <div class="${tagClass}">${n.tag}</div>
+                    <div class="${textClass}">${nameContent}</div>
+                </div>`;
+    }
 
-function renderNode(node) {
-  const supersededClass = node.superseded ? ' superseded' : '';
-  const tagClass = node.type === 'evidence' ? 'node-tag evidence-tag' : 'node-tag';
-  const dotClass = node.type === 'evidence' ? 'node-dot evidence-dot' : 'node-dot';
+    function openCaseModal(key) {
+        const data = caseData[key];
+        if (!data) return;
+        document
+            .querySelectorAll("#caseHistoryList .card-history-item")
+            .forEach((row) => {
+                row.classList.toggle("selected", row.dataset.case === key);
+            });
+        document.getElementById("caseCode").textContent = key;
+        document.getElementById("caseTitle").textContent = data.title;
+        document.getElementById("caseTag1").textContent = data.tags[0];
+        document.getElementById("caseTag2").textContent = data.tags[1];
+        document.getElementById("caseProjectName").textContent =
+            data.project || data.title;
+        document.getElementById("caseChain").innerHTML =
+            '<div class="thread-line"></div>' +
+            data.chain.map(renderChainNode).join("");
+        document.getElementById("caseAfterView").textContent = data.afterView;
+        document.getElementById("caseLinkBtn").onclick = () => {
+            closeCaseModal();
+            linkToQuestion(data.title, data.category);
+        };
+        document.getElementById("caseModalOverlay").classList.add("show");
+    }
 
-  const aiBadge = node.aiSummarized
-    ? `<span class="ai-badge">AI 요약</span>`
-    : '';
+    function closeCaseModal() {
+        document.getElementById("caseModalOverlay").classList.remove("show");
+    }
 
-  const dateHtml = node.date
-    ? `<div class="node-date">${node.date}</div>`
-    : '';
+    // 카드 이력 목록도 미분류 큐와 동일하게 앱 · 담당자 · 일자 · 결정 4가지만 보여줍니다.
+    // 외부 CDN 없이도 항상 표시되도록 아이콘은 이니셜 배지로 표시합니다.
+    const appIconMap = {
+        GitHub: "GH",
+        Jira: "JR",
+        Figma: "FG",
+        Slack: "SL",
+        Sentry: "SN",
+        Linear: "LN",
+    };
 
-  const evidenceHtml = node.source
-    ? `<div class="node-evidence" title="${node.originalText || ''}">${node.source} →</div>`
-    : '';
+    function findChainNode(chain, tag) {
+        return chain.find((n) => n.tag === tag) || null;
+    }
 
-  return `
-    <div class="node${supersededClass}">
-      <div class="${dotClass}"></div>
-      <div class="${tagClass}">${nodeTypeLabel(node.type)}</div>
-      ${aiBadge}
-      <div class="node-text">${node.text}</div>
-      ${dateHtml}
-      ${evidenceHtml}
-    </div>
-  `;
-}
+    function createHistoryRow(key) {
+        const data = caseData[key];
+        const owner = findChainNode(data.chain, "담당");
+        const decision = findChainNode(data.chain, "결정");
+        const appName = data.app || "Slack";
+        const iconInitials = appIconMap[appName] || appName.slice(0, 2).toUpperCase();
+        const ownerValue =
+            owner && owner.name
+                ? owner.name
+                : '<span class="node-empty">아직 입력되지 않음</span>';
+        const decisionValue =
+            decision && decision.name
+                ? decision.name
+                : '<span class="node-empty">아직 입력되지 않음</span>';
+        const dateValue = (decision && decision.date) || "";
+        const projectValue = data.project || data.title;
 
-async function loadContextCard(projectCode) {
-  const root = document.getElementById('context-root');
-  root.innerHTML = `<div class="loading-state">맥락을 불러오는 중…</div>`;
+        const row = document.createElement("div");
+        row.className = "card-history-item";
+        row.dataset.case = key;
+        row.innerHTML = `
+            <div class="uq-fields">
+                <div class="uq-field">
+                    <div class="uq-label">솔루션명</div>
+                    <div class="uq-value">${projectValue}</div>
+                </div>
+                <div class="uq-field">
+                    <div class="uq-label">앱</div>
+                    <div class="unclassified-source">
+                        <span class="unclassified-icon">${iconInitials}</span>
+                        <span class="unclassified-source-name">${appName}</span>
+                    </div>
+                </div>
+                <div class="uq-field">
+                    <div class="uq-label">담당자</div>
+                    <div class="uq-value">${ownerValue}</div>
+                </div>
+                <div class="uq-field">
+                    <div class="uq-label">일자</div>
+                    <div class="uq-value mono">${dateValue}</div>
+                </div>
+                <div class="uq-field uq-field-decision">
+                    <div class="uq-label">결정</div>
+                    <div class="uq-value">${decisionValue}</div>
+                </div>
+            </div>
+        `;
+        row.addEventListener("click", () => openCaseModal(key));
+        return row;
+    }
 
-  try {
-    const data = await API.getContext(projectCode);
-    renderContextCard(data);
-  } catch (e) {
-    console.error('컨텍스트 로드 실패:', e);
-    root.innerHTML = `<div class="error-state">맥락을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.</div>`;
-  }
-}
+    Object.keys(caseData).forEach((key) => {
+        document.getElementById("caseHistoryList").appendChild(createHistoryRow(key));
+    });
 
-function renderContextCard(data) {
-  const root = document.getElementById('context-root');
-
-  const relatedHtml = (data.related || [])
-    .map(r => `<div class="related-item">${r.name}<div class="rdate">${r.date} · ${r.note}</div></div>`)
-    .join('');
-
-  const nodesHtml = data.chain.map(renderNode).join('');
-
-  root.innerHTML = `
-    <div class="case-strip">
-      <div>
-        <div class="case-code mono">${data.entity.code}</div>
-        <div class="case-title">${data.entity.name}</div>
-      </div>
-    </div>
-
-    <div class="context-layout">
-      <div class="context-card">
-        <div class="context-card-head">
-          <div class="owner-line">담당 <span class="owner-name">${data.owner.name}</span> · ${data.owner.years}</div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <div class="ai-category-badge">${data.aiCategory}</div>
-            <div class="hop-badge">${data.hopDepth}-HOP TRACED</div>
-          </div>
-        </div>
-        <div class="chain">
-          <div class="thread-line"></div>
-          ${nodesHtml}
-        </div>
-      </div>
-      <div class="context-side">
-        <div class="side-mini">
-          <div class="side-mini-label">관련 프로젝트</div>
-          ${relatedHtml || '<div class="rdate">연결된 프로젝트 없음</div>'}
-        </div>
-      </div>
-    </div>
-  `;
-
-  // 노드 순차 페이드인 (검색 중처럼 보이지 않게 빠르게, 0.25초 간격)
-  document.querySelectorAll('#context-root .node').forEach((el, i) => {
-    el.style.animationDelay = `${i * 0.25}s`;
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  loadContextCard('PJ-014'); // 데모 기본 진입 프로젝트
-});
+    document
+        .getElementById("caseModalClose")
+        .addEventListener("click", closeCaseModal);
+    document
+        .getElementById("caseModalOverlay")
+        .addEventListener("click", (e) => {
+            if (e.target.id === "caseModalOverlay") closeCaseModal();
+        });
