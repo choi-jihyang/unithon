@@ -11,7 +11,8 @@ class OwnershipTransitionService(
 ) {
 
     /**
-     * F2 이관 실행. 카드는 건드리지 않고 인계 이벤트 1행만 남긴다.
+     * F2 이관 실행. 카드는 건드리지 않고 인계 이벤트 1행만 남긴다. 이전 담당자
+     * (oldUserSeq)는 이관과 동시에 퇴사처리(users.is_use = false)한다.
      *
      * 직급 기반 권한 분리(팀장급 이상만 실행 가능)는 하지 않는다 — 고도화 단계에서 다룰 예정.
      * 지금은 실행자(transitionedByUserSeq)가 실제 존재하는 계정인지만 확인한다.
@@ -20,6 +21,12 @@ class OwnershipTransitionService(
         userRepository.findById(transitionedByUserSeq).orElseThrow {
             ResponseStatusException(HttpStatus.NOT_FOUND, "실행자를 찾을 수 없습니다: $transitionedByUserSeq")
         }
+        val oldUser = userRepository.findById(oldUserSeq).orElseThrow {
+            ResponseStatusException(HttpStatus.NOT_FOUND, "이전 담당자를 찾을 수 없습니다: $oldUserSeq")
+        }
+        oldUser.isUse = false
+        userRepository.save(oldUser)
+
         return ownershipTransitionRepository.save(
             OwnershipTransition(
                 oldUserSeq = oldUserSeq,

@@ -1,32 +1,15 @@
 /**
  * handoff.js — F2 이관 (담당자 선택 → 확인 → 확정)
+ *
+ * 이관 대상 목록/이관받을 담당자 후보 모두 GET /api/users 결과를 그대로 렌더링한다.
+ * (예전 데모 목업의 owners/handoffCandidates 하드코딩 제거 — 실제 유저 수·이름과
+ * 항상 일치하도록.) "담당 프로젝트 N건"과 솔루션별 건수는 GET /api/cards?userSeq=
+ * 응답을 집계해서 구한다.
  */
-    const owners = {
-        kim: {
-            initial: "김",
-            name: "김도현 백엔드 개발자",
-            status: "4년차 · 퇴사예정",
-            projectCountText: "3건",
-            projectBreakdown: [
-                { category: "인증/로그인", count: 1 },
-                { category: "결제/정산", count: 1 },
-                { category: "인프라/배포", count: 1 },
-            ],
-        },
-    };
-    const handoffCandidates = [
-        { key: "jung", name: "정하은 개발자", meta: "백엔드 · 2년차", initial: "정" },
-        { key: "lee", name: "이서준 개발자", meta: "인프라 · 3년차", initial: "이" },
-        { key: "park", name: "박지민 개발자", meta: "프론트엔드 · 2년차", initial: "박" },
-    ];
-
-    let pendingHandoffOwnerKey = null;
-    let pendingHandoffCandidateKey = null;
-
-    // GET /api/users로 받은 실사용자 목록. owners/handoffCandidates는 데모용
-    // 표시 이름(직함 포함)이라, 실제 API 호출에 필요한 userSeq는 이 목록에서
-    // 이름이 접두 일치하는 사용자를 찾아 매핑한다(고정 ID를 하드코딩하지 않음).
     let userList = [];
+    let pendingOwnerSeq = null;
+    let pendingCandidateSeq = null;
+    let pendingOwnerCards = [];
 
     async function loadUsers() {
         try {
@@ -36,49 +19,105 @@
         } catch (e) {
             console.warn("[F2] /api/users 조회 실패:", e.message);
         }
+        renderOwnerList();
     }
     loadUsers();
 
-    function findUserSeq(displayName) {
-        const user = userList.find((u) => displayName.startsWith(u.name));
-        return user ? user.userSeq : null;
+    function findUser(userSeq) {
+        return userList.find((u) => u.userSeq === userSeq) || null;
     }
 
-    function renderHandoffCandidates() {
-        document.getElementById("handoffCandidateList").innerHTML =
-            handoffCandidates
-                .map(
-                    (c) => `<div class="owner-row" data-candidate="${c.key}" style="cursor: pointer">
+    // 퇴사처리(isUse=false)된 사용자는 이관 대상 목록/후보 어느 쪽에도 노출하지 않는다.
+    function activeUsers() {
+        return userList.filter((u) => u.isUse);
+    }
+
+    function userStatusLine(user) {
+        return [user.departmentName, user.positionName].filter(Boolean).join(" · ");
+    }
+
+    async function fetchUserCards(userSeq) {
+        try {
+            const res = await fetch(`/api/cards?userSeq=${userSeq}`);
+            if (!res.ok) throw new Error(`status ${res.status}`);
+            return await res.json();
+        } catch (e) {
+            console.warn("[F2] /api/cards 조회 실패:", e.message);
+            return [];
+        }
+    }
+
+    async function renderOwnerList() {
+        const list = document.getElementById("ownerList");
+        if (!list) return;
+        const active = activeUsers();
+        list.innerHTML = active
+            .map(
+                (u) => `<div class="owner-row" data-owner="${u.userSeq}">
+                    <div class="owner-left">
+                        <div class="avatar owner-avatar">${u.name.slice(0, 1)}</div>
+                        <div>
+                            <b>${u.name}</b>
+                            <div class="owner-sub" id="ownerSub-${u.userSeq}">담당 프로젝트 확인 중…</div>
+                        </div>
+                    </div>
+                    <div class="owner-right">
+                        <span class="status-chip chip-active">재직중</span>
+                    </div>
+                </div>`,
+            )
+            .join("");
+        document.querySelectorAll("#ownerList .owner-row").forEach((row) => {
+            row.addEventListener("click", () =>
+                openHandoffPicker(Number(row.dataset.owner)),
+            );
+        });
+
+        // 목록에 표시할 담당 프로젝트 건수는 각자 비동기로 채운다(순서 무관).
+        active.forEach(async (u) => {
+            const cards = await fetchUserCards(u.userSeq);
+            const sub = document.getElementById(`ownerSub-${u.userSeq}`);
+            if (sub) sub.textContent = `담당 프로젝트 ${cards.length}건`;
+        });
+    }
+
+    function renderHandoffCandidates(excludeUserSeq) {
+        const candidates = activeUsers().filter((u) => u.userSeq !== excludeUserSeq);
+        document.getElementById("handoffCandidateList").innerHTML = candidates
+            .map(
+                (c) => `<div class="owner-row" data-candidate="${c.userSeq}" style="cursor: pointer">
                         <div class="owner-left">
-                            <div class="avatar owner-avatar">${c.initial}</div>
+                            <div class="avatar owner-avatar">${c.name.slice(0, 1)}</div>
                             <div>
                                 <b>${c.name}</b>
-                                <div class="owner-sub">${c.meta}</div>
+                                <div class="owner-sub">${userStatusLine(c)}</div>
                             </div>
                         </div>
                     </div>`,
-                )
-                .join("");
+            )
+            .join("");
         document
             .querySelectorAll("#handoffCandidateList .owner-row")
             .forEach((row) => {
                 row.addEventListener("click", () =>
-                    confirmHandoffTarget(row.dataset.candidate),
+                    confirmHandoffTarget(Number(row.dataset.candidate)),
                 );
             });
     }
 
-    function openHandoffPicker(ownerKey) {
-        const owner = owners[ownerKey];
+    function openHandoffPicker(ownerSeq) {
+        const owner = findUser(ownerSeq);
         if (!owner) return;
-        pendingHandoffOwnerKey = ownerKey;
-        document
-            .querySelectorAll("#ownerList .owner-row")
-            .forEach((row) => {
-                row.classList.toggle("selected", row.dataset.owner === ownerKey);
-            });
+        pendingOwnerSeq = ownerSeq;
+        document.querySelectorAll("#ownerList .owner-row").forEach((row) => {
+            row.classList.toggle(
+                "selected",
+                Number(row.dataset.owner) === ownerSeq,
+            );
+        });
         document.getElementById("handoffPickerNote").textContent =
             `${owner.name}의 프로젝트를 이관받을 담당자를 선택하세요.`;
+        renderHandoffCandidates(ownerSeq);
         document.getElementById("handoffPickerOverlay").classList.add("show");
     }
 
@@ -96,27 +135,35 @@
         el.innerHTML = `<div class="handoff-feedback ${type}">${message}</div>`;
     }
 
-    function confirmHandoffTarget(candidateKey) {
-        const owner = owners[pendingHandoffOwnerKey];
-        const candidate = handoffCandidates.find((c) => c.key === candidateKey);
+    async function confirmHandoffTarget(candidateSeq) {
+        const owner = findUser(pendingOwnerSeq);
+        const candidate = findUser(candidateSeq);
         if (!owner || !candidate) return;
-        pendingHandoffCandidateKey = candidateKey;
+        pendingCandidateSeq = candidateSeq;
         renderHandoffFeedback("", null);
 
-        document.getElementById("handoffAvatar").textContent = owner.initial;
-        document.getElementById("handoffName").textContent = owner.name;
-        document.getElementById("handoffStatus").textContent = owner.status;
-        document.getElementById("handoffCases").innerHTML =
-            `담당 프로젝트 <b>${owner.projectCountText}</b>이 <b>${candidate.name}</b>에게 이관됩니다.<br />축적된 결정·근거 그래프는 그대로 유지되며, 담당자 정보만 갱신됩니다.`;
+        pendingOwnerCards = await fetchUserCards(owner.userSeq);
+        const total = pendingOwnerCards.length;
+        const breakdown = new Map();
+        pendingOwnerCards.forEach((card) => {
+            const key = card.solution || "미지정";
+            breakdown.set(key, (breakdown.get(key) || 0) + 1);
+        });
 
-        document.getElementById("handoffProjectTotal").textContent =
-            `총 ${owner.projectCountText}`;
-        document.getElementById("handoffProjectBreakdown").innerHTML = owner.projectBreakdown
+        document.getElementById("handoffAvatar").textContent = owner.name.slice(0, 1);
+        document.getElementById("handoffName").textContent = owner.name;
+        document.getElementById("handoffStatus").textContent = userStatusLine(owner);
+        document.getElementById("handoffCases").innerHTML =
+            `담당 프로젝트 <b>${total}건</b>이 <b>${candidate.name}</b>에게 이관됩니다.<br />축적된 결정·근거 그래프는 그대로 유지되며, 담당자 정보만 갱신됩니다.`;
+
+        document.getElementById("handoffProjectTotal").textContent = `총 ${total}건`;
+        const entries = Array.from(breakdown.entries());
+        document.getElementById("handoffProjectBreakdown").innerHTML = entries
             .map(
-                (b, i, arr) =>
-                    `<div class="owner-row" style="padding: 8px 0${i === arr.length - 1 ? "; border-bottom: none" : ""}">
-                        <span style="font-size: 14px">${b.category}</span>
-                        <span class="mono project-code">${b.count}건</span>
+                ([solution, count], i) =>
+                    `<div class="owner-row" style="padding: 8px 0${i === entries.length - 1 ? "; border-bottom: none" : ""}">
+                        <span style="font-size: 14px">${solution}</span>
+                        <span class="mono project-code">${count}건</span>
                     </div>`,
             )
             .join("");
@@ -132,21 +179,9 @@
     }
 
     async function submitHandoffConfirm() {
-        const owner = owners[pendingHandoffOwnerKey];
-        const candidate = handoffCandidates.find(
-            (c) => c.key === pendingHandoffCandidateKey,
-        );
+        const owner = findUser(pendingOwnerSeq);
+        const candidate = findUser(pendingCandidateSeq);
         if (!owner || !candidate) return;
-
-        const oldUserSeq = findUserSeq(owner.name);
-        const newUserSeq = findUserSeq(candidate.name);
-        if (!oldUserSeq || !newUserSeq) {
-            renderHandoffFeedback(
-                "사용자 정보를 아직 불러오지 못했습니다. 잠시 후 다시 시도해주세요.",
-                "error",
-            );
-            return;
-        }
 
         const btn = document.getElementById("handoffConfirmBtn");
         btn.disabled = true;
@@ -158,8 +193,8 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    oldUserSeq,
-                    newUserSeq,
+                    oldUserSeq: owner.userSeq,
+                    newUserSeq: candidate.userSeq,
                     transitionedByUserSeq: getCurrentUserSeq(),
                 }),
             });
@@ -182,9 +217,6 @@
         }
     }
 
-    document.querySelectorAll("#ownerList .owner-row").forEach((row) => {
-        row.addEventListener("click", () => openHandoffPicker(row.dataset.owner));
-    });
     document
         .getElementById("handoffPickerClose")
         .addEventListener("click", closeHandoffPicker);
@@ -196,5 +228,3 @@
     document
         .getElementById("handoffConfirmBtn")
         .addEventListener("click", submitHandoffConfirm);
-
-    renderHandoffCandidates();
