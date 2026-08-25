@@ -43,7 +43,11 @@
         localStorage.setItem("userSeq", userSeq);
     }
 
-    function linkToQuestion(title, category) {
+    // 카드 상세 "이 업무에 대해 질문하기"로 넘어온 질문에 card_seq를 실어 보내기 위한
+    // 상태. questions.js의 submitNewQuestion()이 읽고, 등록 완료/배너 닫기 시 초기화된다.
+    let linkedCardSeq = null;
+
+    function linkToQuestion(title, category, cardSeq) {
         document
             .querySelectorAll(".tab")
             .forEach((x) => x.classList.remove("active"));
@@ -57,8 +61,14 @@
         document.getElementById("linkedBanner").classList.add("show");
         const sel = document.getElementById("projectTypeSelect");
         sel.value = category;
-        sel.disabled = true;
+        linkedCardSeq = cardSeq ?? null;
         window.scrollTo(0, 0);
+    }
+
+    function clearLinkedQuestion() {
+        linkedCardSeq = null;
+        document.getElementById("linkedBanner").classList.remove("show");
+        document.getElementById("projectTypeSelect").disabled = false;
     }
 
     document.addEventListener("keydown", (e) => {

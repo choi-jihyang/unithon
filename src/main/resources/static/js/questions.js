@@ -224,7 +224,7 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     userSeq: getCurrentUserSeq(),
-                    cardSeq: null,
+                    cardSeq: linkedCardSeq,
                     solution,
                     category,
                     targetPart,
@@ -235,6 +235,7 @@
             await res.json();
 
             input.value = "";
+            clearLinkedQuestion();
             await loadQuestions();
         } catch (e) {
             console.warn("[F4] 질문 등록 실패:", e.message);
