@@ -16,19 +16,21 @@
 - [x] `DataSeeder.kt` — 유저 5명(김도현/정하은/이서준/박지민/관리자) + 데모 카드 4개(PJ-014/021/033/040) 시드, 멱등(테이블 비어있을 때만)
 - [x] TiDB Cloud 실제 연결 확인 (bootRun → 테이블 자동 생성 → curl로 API 응답/403 검증까지 완료)
 
-## Task 3. ownership_transitions
-- [ ] `OwnershipTransition.kt` — `schema.md` 그대로(`oldUserSeq`/`newUserSeq`/`transitionedBy`/`transitionedAt`, `cardSeq` 없음)
-- [ ] `OwnershipTransitionRepository.kt`
-- [ ] `OwnershipTransitionService.kt` — `transitionedByUserSeq`의 `position_seq >= 5` 권한 체크
-- [ ] `OwnershipTransitionController.kt` — `POST /api/ownership-transitions`
-- [ ] Task 2의 카드 조회 병합 로직 실제로 동작하는지 확인 (A→B 이관 후 B가 A 카드도 보이는지)
+## Task 3. ownership_transitions — ✅ 완료
+- [x] `OwnershipTransition.kt` — `schema.md` 그대로(`oldUserSeq`/`newUserSeq`/`transitionedBy`/`transitionedAt`, `cardSeq` 없음)
+- [x] `OwnershipTransitionRepository.kt`
+- [x] `OwnershipTransitionService.kt` — `transitionedByUserSeq`의 `position_seq >= 5` 권한 체크(미달 시 403), `resolveVisibleUserSeqs`(BFS 재귀 병합)
+- [x] `OwnershipTransitionController.kt` — `POST /api/ownership-transitions`
+- [x] `CardService`가 이제 `resolveVisibleUserSeqs`로 병합해서 조회 — 실제로 이관 실행 후 curl로 검증 완료(이서준→정하은 이관 후 정하은이 본인 1건+이서준 2건=3건 조회됨, 권한 없는 계정은 403)
 
-## Task 4. questions / question_answers
-- [ ] `Question.kt`, `QuestionAnswer.kt`
-- [ ] Repository 2개
-- [ ] `QuestionService.kt` — 답변 등록 시 `questions.is_answer=1` 갱신
-- [ ] `QuestionController.kt` — `POST /api/questions`, `POST /api/questions/{questionSeq}/answers`
-- [ ] `Card.kt` 상세 조회에 `afterViewCount`(=`questions.card_seq` count) 반영
+## Task 4. questions / question_answers — ✅ 완료
+- [x] `Question.kt`, `QuestionAnswer.kt`
+- [x] Repository 2개 (`QuestionRepository.countByCardSeq` 포함)
+- [x] `QuestionService.kt` — 답변 등록 시 `questions.is_answer=1` 갱신
+- [x] `QuestionController.kt` — `POST /api/questions`, `POST /api/questions/{questionSeq}/answers`
+- [x] `CardService` 상세 조회에 `afterViewCount`(=`questions.card_seq` count) 실제 연결, curl로 질문→답변→카운트 반영까지 확인
+
+> 테스트 중 발견: `application.properties`의 `anthropic.api-key=${ANTHROPIC_API_KEY}`에 기본값이 없어서, 이 env var가 없으면 **F6과 무관하게 앱 전체가 부팅 실패**한다. 검증은 로컬 전용 더미 값으로 우회했음 — 실제 해결은 별도 논의 필요(사용자가 "아직"이라고 보류함).
 
 ## Task 5. 프론트 fetch 연결
 - [ ] `js/context.js` — `caseData` 인라인 상수 대신 `GET /api/cards`/`GET /api/cards/{id}` fetch로 채움 (렌더 함수 재사용)

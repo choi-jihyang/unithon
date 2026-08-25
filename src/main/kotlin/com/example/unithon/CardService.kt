@@ -9,14 +9,16 @@ private val DATE_FMT: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.d
 class CardService(
     private val cardRepository: CardRepository,
     private val userRepository: UserRepository,
+    private val ownershipTransitionService: OwnershipTransitionService,
+    private val questionRepository: QuestionRepository,
 ) {
 
     /**
-     * userSeq가 조회 가능한 카드 목록. 지금은 본인 카드만 — 이관 체인 병합(과거 담당자 카드까지
-     * 포함)은 Task 3(ownership_transitions) 완료 후 여기에 추가한다.
+     * userSeq가 조회 가능한 카드 목록. 본인 카드 + 이관 체인으로 연결된 과거 담당자들의
+     * 카드까지 재귀로 병합한다(OwnershipTransitionService.resolveVisibleUserSeqs 참고).
      */
     fun findVisibleCards(userSeq: Long): List<CardListItem> {
-        val visibleUserSeqs = listOf(userSeq) // TODO(Task 3): ownership_transitions 재귀 병합으로 교체
+        val visibleUserSeqs = ownershipTransitionService.resolveVisibleUserSeqs(userSeq)
         val cards = cardRepository.findByUserSeqInOrderByCreatedAtDesc(visibleUserSeqs)
         val userNames = userRepository.findAllById(cards.map { it.userSeq })
             .associate { it.userSeq to it.name }
@@ -41,7 +43,7 @@ class CardService(
      */
     fun findCardDetail(cardSeq: Long, requesterUserSeq: Long): CardDetail? {
         val card = cardRepository.findById(cardSeq).orElse(null) ?: return null
-        val visibleUserSeqs = listOf(requesterUserSeq) // TODO(Task 3): 이관 체인 병합으로 교체
+        val visibleUserSeqs = ownershipTransitionService.resolveVisibleUserSeqs(requesterUserSeq)
         if (card.userSeq !in visibleUserSeqs) return null
 
         val ownerName = userRepository.findById(card.userSeq).map { it.name }.orElse("알수없음")
@@ -68,7 +70,7 @@ class CardService(
             title = card.title,
             solution = card.solution,
             category = card.category,
-            afterViewCount = 0, // TODO(Task 4): questions.card_seq count로 교체
+            afterViewCount = questionRepository.countByCardSeq(cardSeq),
             chain = chain,
         )
     }
