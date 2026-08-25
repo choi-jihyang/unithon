@@ -62,6 +62,7 @@
     }
 
     async function loadSummary(key, data) {
+        console.log("[DEBUG] loadSummary called", key, data);
         if (data.summary) {
             renderSummary(data.summary, false);
             return;
@@ -235,6 +236,7 @@
             const wrapper =
                 cardSummaryCache[cardSeq] || (cardSummaryCache[cardSeq] = {});
             wrapper.originalText = buildOriginalText(detail.chain);
+            console.log("[DEBUG] about to call loadSummary");
             loadSummary(key, wrapper);
         } catch (e) {
             console.warn("[F3] /api/cards/{cardSeq} 조회 실패:", e.message);
