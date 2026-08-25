@@ -13,7 +13,7 @@
 - [x] `CardRepository.kt`
 - [x] `CardService.kt` — `findVisibleCards`/`findCardDetail`. 이관 체인 병합은 `TODO(Task 3)`로 표시, 지금은 본인 카드만
 - [x] `CardController.kt` — `GET /api/cards?userSeq=`, `GET /api/cards/{cardSeq}?userSeq=`(403 처리 포함)
-- [x] `DataSeeder.kt` — 유저 5명(김도현/정하은/이서준/박지민/관리자) + 데모 카드 4개(PJ-014/021/033/040) 시드, 멱등(테이블 비어있을 때만)
+- [x] `db/seed.sql` — 유저 5명(김도현/정하은/이서준/박지민/관리자) + 데모 카드 4개(PJ-014/021/033/040) 시드 SQL. `DataSeeder.kt`(앱 부팅 시 자동 시드)는 삭제 — 로컬 DB에 SQL 파일로 직접 넣는 방식으로 변경
 - [x] TiDB Cloud 실제 연결 확인 (bootRun → 테이블 자동 생성 → curl로 API 응답/403 검증까지 완료)
 
 ## Task 3. ownership_transitions — ✅ 완료
