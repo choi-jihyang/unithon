@@ -330,3 +330,50 @@ INSERT INTO app_logs (
     '2025-03-01', 'CLASSIFIED',
     (SELECT seq FROM cards WHERE title = '로그인 화면 OAuth 버튼 순서 변경'), NOW()
   );
+
+-- user_map_app — F1 연동 설정(김도현 기준). GitHub/Jira/Figma는 구조화 소스라 기본 on,
+-- Slack/Sentry/Linear는 비구조화 소스라 기본 off — index.html의 기존 정적 토글 상태와 동일.
+INSERT INTO user_map_app (user_seq, source_type, enabled, updated_at) VALUES
+  ((SELECT user_seq FROM users WHERE user_id = 'kimdohyun'), 'GITHUB', 1, NOW()),
+  ((SELECT user_seq FROM users WHERE user_id = 'kimdohyun'), 'JIRA', 1, NOW()),
+  ((SELECT user_seq FROM users WHERE user_id = 'kimdohyun'), 'FIGMA', 1, NOW()),
+  ((SELECT user_seq FROM users WHERE user_id = 'kimdohyun'), 'SLACK', 0, NOW()),
+  ((SELECT user_seq FROM users WHERE user_id = 'kimdohyun'), 'SENTRY', 0, NOW()),
+  ((SELECT user_seq FROM users WHERE user_id = 'kimdohyun'), 'LINEAR', 0, NOW());
+
+-- app_logs — F1 미분류 큐(김도현 기준). Slack 메시지는 원문 raw 테이블이 아직 없어
+-- (schema.md상 Slack/Sentry/Linear 원문 테이블은 보류 상태) source_seq는 NULL.
+-- 미분류 기준: 카드 제목을 특정할 수 없는 일상 대화/질문성 메시지라 title=NULL, status=UNCLASSIFIED로 둔다.
+INSERT INTO app_logs (
+  user_seq, source_type, title, decision_content, status, created_at
+) VALUES
+  (
+    (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
+    'SLACK', NULL, '이거 롤백해야 할 것 같은데 확인 부탁드려요', 'UNCLASSIFIED',
+    '2026-08-24 10:20:00'
+  ),
+  (
+    (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
+    'SLACK', NULL, '회의록 링크 여기 공유드립니다', 'UNCLASSIFIED',
+    '2026-08-23 15:05:00'
+  ),
+  (
+    (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
+    'SLACK', NULL, '점심 뭐 드실래요 근처에 새로 생긴 데 있던데', 'UNCLASSIFIED',
+    '2026-08-22 12:10:00'
+  ),
+  (
+    (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
+    'SLACK', NULL, '내일 3시에 배포 가능하신가요', 'UNCLASSIFIED',
+    '2026-08-21 09:40:00'
+  ),
+  (
+    (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
+    'SLACK', NULL, '그거 OAuth 쪽으로 바꾸는 게 나을 것 같은데요', 'UNCLASSIFIED',
+    '2026-08-20 14:15:00'
+  ),
+  (
+    (SELECT user_seq FROM users WHERE user_id = 'kimdohyun'),
+    'SLACK', NULL, '이 로그 좀 봐주실 수 있나요 뭔가 이상해서요', 'UNCLASSIFIED',
+    '2026-08-19 11:30:00'
+  );
