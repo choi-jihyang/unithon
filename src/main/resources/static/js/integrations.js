@@ -118,7 +118,7 @@
             app: source,
             tags: [source, `등록 ${todayLabel}`],
             category: "미분류",
-            afterView: "후속 문의 없음",
+            afterView: "관련 질문 없음",
             related: [],
             chain: [
                 { tag: "담당", name: owner, date: todayLabel },

@@ -13,7 +13,7 @@
             tags: ["백엔드", "착수 2025.03.05"],
             category: "인증/로그인",
             hop: "3-HOP TRACED",
-            afterView: "후속 문의 1건",
+            afterView: "관련 질문 1건",
             related: [
                 { name: "결제 모듈", date: "2025.06.14 · 정기결제 로직 변경" },
                 { name: "배포 파이프라인", date: "2025.07.04 · CI 단계 축소" },
@@ -48,7 +48,7 @@
             tags: ["백엔드", "착수 2025.04.10"],
             category: "결제/정산",
             hop: "2-HOP TRACED",
-            afterView: "후속 문의 2건",
+            afterView: "관련 질문 2건",
             related: [
                 { name: "인증 시스템", date: "2025.05.07 · OAuth2 기반 인증 전환" },
             ],
@@ -82,7 +82,7 @@
             tags: ["인프라", "착수 2025.02.20"],
             category: "인프라/배포",
             hop: "2-HOP TRACED",
-            afterView: "후속 문의 1건",
+            afterView: "관련 질문 1건",
             related: [
                 { name: "CI 캐시 최적화", date: "2025.08.24 · 캐시 계층 추가" },
             ],
@@ -116,7 +116,7 @@
             tags: ["인프라", "착수 2025.08.01"],
             category: "인프라/배포",
             hop: "1-HOP TRACED",
-            afterView: "후속 문의 없음",
+            afterView: "관련 질문 없음",
             related: [
                 { name: "배포 파이프라인", date: "2025.07.04 · CI 단계 축소" },
             ],
