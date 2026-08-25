@@ -1533,3 +1533,29 @@
             color: var(--text-faint);
             font-family: "Pretendard", sans-serif;
         }
+
+        /* ===== F2: 이관 확정 피드백 ===== */
+        .handoff-feedback {
+            margin-top: 10px;
+            font-size: 13.5px;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 9px 12px;
+        }
+        .handoff-feedback.success {
+            color: var(--mint);
+            background: rgba(44, 229, 165, 0.1);
+            border: 1px solid rgba(44, 229, 165, 0.3);
+        }
+        .handoff-feedback.error {
+            color: var(--danger);
+            background: rgba(201, 154, 82, 0.12);
+            border: 1px solid rgba(201, 154, 82, 0.35);
+        }
+
+        /* ===== F3/F4: API 실패 시 안내 ===== */
+        .api-error-note {
+            font-size: 13.5px;
+            color: var(--danger);
+            padding: 14px 0;
+        }
